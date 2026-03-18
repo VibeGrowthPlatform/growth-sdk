@@ -1,0 +1,16 @@
+{
+  "name": "com.vibegrowth.sdk",
+  "version": "1.0.0",
+  "displayName": "Vibe Growth SDK",
+  "description": "Vibe Growth SDK for Unity - attribution, user identity, and revenue tracking",
+  "unity": "2021.3",
+  "keywords": [
+    "vibegrowth",
+    "sdk",
+    "attribution",
+    "analytics"
+  ],
+  "author": {
+    "name": "Vibe Growth"
+  }
+}

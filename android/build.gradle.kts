@@ -1,0 +1,32 @@
+plugins {
+    id("com.android.library") version "8.1.4"
+    id("org.jetbrains.kotlin.android") version "1.9.22"
+}
+
+android {
+    namespace = "com.vibegrowth.sdk"
+    compileSdk = 34
+
+    defaultConfig {
+        minSdk = 21
+        buildConfigField("String", "SDK_VERSION", "\"1.0.0\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+dependencies {
+    implementation("com.android.installreferrer:installreferrer:2.2")
+    implementation("com.google.android.gms:play-services-ads-identifier:18.0.1")
+}
