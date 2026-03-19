@@ -77,4 +77,14 @@ import Foundation
         }
         post(path: ApiEndpoints.revenue, body: body, completion: completion)
     }
+
+    @objc public func postSession(deviceId: String, sessionStart: String, sessionDurationMs: Int, completion: ((Bool, String?) -> Void)?) {
+        let body: [String: Any] = [
+            "app_id": config.appId,
+            "device_id": deviceId,
+            "session_start": sessionStart,
+            "session_duration_ms": sessionDurationMs
+        ]
+        post(path: ApiEndpoints.session, body: body, completion: completion)
+    }
 }

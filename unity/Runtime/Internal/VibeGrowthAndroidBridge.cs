@@ -48,6 +48,11 @@ namespace VibeGrowth
             _sdk.Call("trackAdRevenue", source, revenue, currency);
         }
 
+        public void TrackSession(string sessionStart, int sessionDurationMs)
+        {
+            _sdk.Call("trackSession", sessionStart, sessionDurationMs);
+        }
+
         private class InitCallback : AndroidJavaProxy
         {
             private readonly Action _onSuccess;

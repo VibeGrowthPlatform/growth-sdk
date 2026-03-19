@@ -36,4 +36,11 @@ class VibeGrowthMethodChannel {
       'currency': currency,
     });
   }
+
+  Future<void> trackSession(String sessionStart, int sessionDurationMs) {
+    return _channel.invokeMethod<void>('trackSession', <String, dynamic>{
+      'sessionStart': sessionStart,
+      'sessionDurationMs': sessionDurationMs,
+    });
+  }
 }

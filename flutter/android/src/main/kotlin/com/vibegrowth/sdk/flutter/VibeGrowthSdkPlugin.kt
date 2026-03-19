@@ -93,6 +93,20 @@ class VibeGrowthSdkPlugin : FlutterPlugin, MethodCallHandler {
                     result.error("NOT_INITIALIZED", e.message, null)
                 }
             }
+            "trackSession" -> {
+                val sessionStart = call.argument<String>("sessionStart")
+                val sessionDurationMs = call.argument<Int>("sessionDurationMs")
+                if (sessionStart == null || sessionDurationMs == null) {
+                    result.error("INVALID_ARGS", "sessionStart and sessionDurationMs are required", null)
+                    return
+                }
+                try {
+                    VibeGrowthSDK.trackSession(sessionStart, sessionDurationMs)
+                    result.success(null)
+                } catch (e: IllegalStateException) {
+                    result.error("NOT_INITIALIZED", e.message, null)
+                }
+            }
             else -> result.notImplemented()
         }
     }

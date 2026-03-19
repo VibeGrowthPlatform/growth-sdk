@@ -61,6 +61,12 @@ namespace VibeGrowth
             _bridge.TrackAdRevenue(source, revenue, currency);
         }
 
+        public static void TrackSession(string sessionStart, int sessionDurationMs)
+        {
+            CheckInitialized();
+            _bridge.TrackSession(sessionStart, sessionDurationMs);
+        }
+
         private static void CheckInitialized()
         {
             if (!_initialized)

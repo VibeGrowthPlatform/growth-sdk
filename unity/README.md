@@ -1,6 +1,6 @@
 # Vibe Growth SDK for Unity
 
-Unity plugin for attribution, user identity, and revenue tracking.
+Unity plugin for attribution, user identity, session tracking, and revenue tracking.
 
 **Requirements:** Unity 2021.3+, Android minSdk 21, iOS 14+
 
@@ -69,4 +69,10 @@ VibeGrowthSDK.TrackAdRevenue(new Dictionary<string, object> {
     { "revenue", 0.02 },
     { "currency", "USD" }
 });
+```
+
+### Track Session
+
+```csharp
+VibeGrowthSDK.TrackSession("2026-01-01T00:00:00Z", 45000);
 ```

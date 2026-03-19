@@ -1,8 +1,8 @@
 # Vibe Growth Native SDK
 
 Shared native Android (Kotlin) and iOS (Swift) layers for attribution, user
-identity, and revenue tracking. These native libraries are consumed by the
-Flutter and Unity SDK plugins via source inclusion.
+identity, session tracking, and revenue tracking. These native libraries are
+consumed by the Flutter and Unity SDK plugins via source inclusion.
 
 ## Package Layout
 
@@ -147,6 +147,33 @@ Authorization: Bearer <api_key>
 {
   "status": "ok",
   "event_id": "uuid-event-id"
+}
+```
+
+### POST /api/sdk/session
+
+Track an app session.
+
+**Headers:**
+```
+Content-Type: application/json
+Authorization: Bearer <api_key>
+```
+
+**Request Body:**
+```json
+{
+  "app_id": "your-app-id",
+  "device_id": "uuid-device-id",
+  "session_start": "2026-01-01T00:00:00Z",
+  "session_duration_ms": 45000
+}
+```
+
+**Response:**
+```json
+{
+  "status": "ok"
 }
 ```
 

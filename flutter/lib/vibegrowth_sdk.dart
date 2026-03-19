@@ -37,4 +37,11 @@ class VibeGrowth {
   }) {
     return _channel.trackAdRevenue(source, revenue, currency);
   }
+
+  static Future<void> trackSession({
+    required String sessionStart,
+    required int sessionDurationMs,
+  }) {
+    return _channel.trackSession(sessionStart, sessionDurationMs);
+  }
 }

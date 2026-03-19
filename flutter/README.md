@@ -1,6 +1,6 @@
 # Vibe Growth SDK for Flutter
 
-Flutter plugin for attribution, user identity, and revenue tracking.
+Flutter plugin for attribution, user identity, session tracking, and revenue tracking.
 
 **Requirements:** Dart >= 3.0.0, Flutter >= 3.10.0, Android minSdk 21, iOS 14+
 
@@ -65,5 +65,14 @@ await VibeGrowth.trackAdRevenue(
   source: 'admob',
   revenue: 0.02,
   currency: 'USD',
+);
+```
+
+### Track Session
+
+```dart
+await VibeGrowth.trackSession(
+  sessionStart: '2026-01-01T00:00:00Z',
+  sessionDurationMs: 45000,
 );
 ```

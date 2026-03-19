@@ -65,4 +65,14 @@ class ApiClient(private val config: VibeGrowthConfig) {
         }
         return post(ApiEndpoints.REVENUE, event)
     }
+
+    fun postSession(deviceId: String, sessionStart: String, sessionDurationMs: Int): String {
+        val body = JSONObject().apply {
+            put("app_id", config.appId)
+            put("device_id", deviceId)
+            put("session_start", sessionStart)
+            put("session_duration_ms", sessionDurationMs)
+        }
+        return post(ApiEndpoints.SESSION, body)
+    }
 }

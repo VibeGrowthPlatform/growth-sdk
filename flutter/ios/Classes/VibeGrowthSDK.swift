@@ -84,6 +84,16 @@ import Foundation
         revenueTracker?.trackAdRevenue(source: source, revenue: revenue, currency: currency)
     }
 
+    @objc public func trackSession(sessionStart: String, sessionDurationMs: Int) {
+        checkInitialized()
+        guard let identityManager = identityManager, let apiClient = apiClient else { return }
+
+        DispatchQueue.global(qos: .background).async {
+            let deviceId = identityManager.getOrCreateDeviceId()
+            apiClient.postSession(deviceId: deviceId, sessionStart: sessionStart, sessionDurationMs: sessionDurationMs, completion: nil)
+        }
+    }
+
     private func checkInitialized() {
         if !isInitialized {
             NSException(name: .internalInconsistencyException, reason: "VibeGrowthSDK is not initialized. Call initialize() first.").raise()

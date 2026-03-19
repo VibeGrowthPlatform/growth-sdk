@@ -9,5 +9,6 @@ namespace VibeGrowth
         string GetUserId();
         void TrackPurchase(double amount, string currency, string productId);
         void TrackAdRevenue(string source, double revenue, string currency);
+        void TrackSession(string sessionStart, int sessionDurationMs);
     }
 }

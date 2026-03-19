@@ -51,4 +51,9 @@ extern "C" {
         [[VibeGrowthSDK shared] trackAdRevenueWithSource:nsSource revenue:revenue currency:nsCurrency];
     }
 
+    void _vibegrowth_trackSession(const char *sessionStart, int sessionDurationMs) {
+        NSString *nsSessionStart = [NSString stringWithUTF8String:sessionStart];
+        [[VibeGrowthSDK shared] trackSessionWithSessionStart:nsSessionStart sessionDurationMs:sessionDurationMs];
+    }
+
 }

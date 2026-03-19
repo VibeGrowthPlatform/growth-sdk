@@ -31,5 +31,10 @@ namespace VibeGrowth
         {
             Debug.Log($"[VibeGrowth] TrackAdRevenue called with source={source}, revenue={revenue}, currency={currency}");
         }
+
+        public void TrackSession(string sessionStart, int sessionDurationMs)
+        {
+            Debug.Log($"[VibeGrowth] TrackSession called with sessionStart={sessionStart}, sessionDurationMs={sessionDurationMs}");
+        }
     }
 }

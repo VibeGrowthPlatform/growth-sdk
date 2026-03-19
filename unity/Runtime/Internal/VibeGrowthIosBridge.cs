@@ -28,6 +28,9 @@ namespace VibeGrowth
         [DllImport("__Internal")]
         private static extern void _vibegrowth_trackAdRevenue(string source, double revenue, string currency);
 
+        [DllImport("__Internal")]
+        private static extern void _vibegrowth_trackSession(string sessionStart, int sessionDurationMs);
+
         public void Initialize(string appId, string apiKey, Action onSuccess, Action<string> onError)
         {
             _onSuccess = onSuccess;
@@ -53,6 +56,11 @@ namespace VibeGrowth
         public void TrackAdRevenue(string source, double revenue, string currency)
         {
             _vibegrowth_trackAdRevenue(source, revenue, currency);
+        }
+
+        public void TrackSession(string sessionStart, int sessionDurationMs)
+        {
+            _vibegrowth_trackSession(sessionStart, sessionDurationMs);
         }
 
         [MonoPInvokeCallback(typeof(SuccessCallback))]

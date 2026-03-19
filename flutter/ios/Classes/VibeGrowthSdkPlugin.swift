@@ -58,6 +58,15 @@ public class VibeGrowthSdkPlugin: NSObject, FlutterPlugin {
             VibeGrowthSDK.shared.trackAdRevenue(source: source, revenue: revenue, currency: currency)
             result(nil)
 
+        case "trackSession":
+            guard let sessionStart = args?["sessionStart"] as? String,
+                  let sessionDurationMs = args?["sessionDurationMs"] as? Int else {
+                result(FlutterError(code: "INVALID_ARGS", message: "sessionStart and sessionDurationMs are required", details: nil))
+                return
+            }
+            VibeGrowthSDK.shared.trackSession(sessionStart: sessionStart, sessionDurationMs: sessionDurationMs)
+            result(nil)
+
         default:
             result(FlutterMethodNotImplemented)
         }

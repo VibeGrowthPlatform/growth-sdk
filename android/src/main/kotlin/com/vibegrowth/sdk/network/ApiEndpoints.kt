@@ -4,5 +4,6 @@ object ApiEndpoints {
     const val INIT = "/api/sdk/init"
     const val IDENTIFY = "/api/sdk/identify"
     const val REVENUE = "/api/sdk/revenue"
+    const val SESSION = "/api/sdk/session"
     const val CONFIG = "/api/sdk/config"
 }

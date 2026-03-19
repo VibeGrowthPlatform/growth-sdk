@@ -90,6 +90,18 @@ object VibeGrowthSDK {
         revenueTracker.trackAdRevenue(source, revenue, currency)
     }
 
+    fun trackSession(sessionStart: String, sessionDurationMs: Int) {
+        checkInitialized()
+        thread {
+            try {
+                val deviceId = identityManager.getOrCreateDeviceId()
+                apiClient.postSession(deviceId, sessionStart, sessionDurationMs)
+            } catch (_: Exception) {
+                // Silently handle network errors for session tracking
+            }
+        }
+    }
+
     private fun checkInitialized() {
         if (!isInitialized) {
             throw IllegalStateException("VibeGrowthSDK is not initialized. Call initialize() first.")
