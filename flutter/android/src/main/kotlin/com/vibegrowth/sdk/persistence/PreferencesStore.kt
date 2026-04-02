@@ -15,4 +15,12 @@ class PreferencesStore(context: Context) {
     fun putString(key: String, value: String) {
         prefs.edit().putString(key, value).apply()
     }
+
+    fun getBoolean(key: String, defaultValue: Boolean = false): Boolean {
+        return prefs.getBoolean(key, defaultValue)
+    }
+
+    fun putBoolean(key: String, value: Boolean) {
+        prefs.edit().putBoolean(key, value).apply()
+    }
 }

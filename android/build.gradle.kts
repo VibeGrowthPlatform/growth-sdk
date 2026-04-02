@@ -3,6 +3,9 @@ plugins {
     id("org.jetbrains.kotlin.android") version "1.9.22"
 }
 
+group = "com.vibegrowth"
+version = "2.1.0"
+
 android {
     namespace = "com.vibegrowth.sdk"
     compileSdk = 34
@@ -29,4 +32,5 @@ android {
 dependencies {
     implementation("com.android.installreferrer:installreferrer:2.2")
     implementation("com.google.android.gms:play-services-ads-identifier:18.0.1")
+    testImplementation("junit:junit:4.13.2")
 }

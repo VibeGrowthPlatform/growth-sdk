@@ -17,6 +17,11 @@ let package = Package(
         .target(
             name: "VibeGrowthSDK",
             path: "Sources/VibeGrowthSDK"
+        ),
+        .testTarget(
+            name: "VibeGrowthSDKTests",
+            dependencies: ["VibeGrowthSDK"],
+            path: "Tests/VibeGrowthSDKTests"
         )
     ]
 )

@@ -15,7 +15,7 @@ namespace VibeGrowth
             }
         }
 
-        public void Initialize(string appId, string apiKey, Action onSuccess, Action<string> onError)
+        public void Initialize(string appId, string apiKey, string baseUrl, Action onSuccess, Action<string> onError)
         {
             AndroidJavaObject context;
             using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -25,7 +25,14 @@ namespace VibeGrowth
             }
 
             var callback = new InitCallback(onSuccess, onError);
-            _sdk.Call("initialize", context, appId, apiKey, callback);
+            if (string.IsNullOrEmpty(baseUrl))
+            {
+                _sdk.Call("initialize", context, appId, apiKey, callback);
+            }
+            else
+            {
+                _sdk.Call("initialize", context, appId, apiKey, baseUrl, callback);
+            }
         }
 
         public void SetUserId(string userId)
@@ -38,9 +45,9 @@ namespace VibeGrowth
             return _sdk.Call<string>("getUserId");
         }
 
-        public void TrackPurchase(double amount, string currency, string productId)
+        public void TrackPurchase(double pricePaid, string currency, string productId)
         {
-            _sdk.Call("trackPurchase", amount, currency, productId);
+            _sdk.Call("trackPurchase", pricePaid, currency, productId);
         }
 
         public void TrackAdRevenue(string source, double revenue, string currency)
@@ -48,9 +55,15 @@ namespace VibeGrowth
             _sdk.Call("trackAdRevenue", source, revenue, currency);
         }
 
-        public void TrackSession(string sessionStart, int sessionDurationMs)
+        public void TrackSessionStart(string sessionStart)
         {
-            _sdk.Call("trackSession", sessionStart, sessionDurationMs);
+            _sdk.Call("trackSessionStart", sessionStart);
+        }
+
+        public void GetConfig(Action<string> onSuccess, Action<string> onError)
+        {
+            var callback = new ConfigCallback(onSuccess, onError);
+            _sdk.Call("getConfig", callback);
         }
 
         private class InitCallback : AndroidJavaProxy
@@ -72,6 +85,29 @@ namespace VibeGrowth
             }
 
             // Called from Java on background thread
+            void onError(string error)
+            {
+                UnityMainThreadDispatcher.Enqueue(() => _onError?.Invoke(error));
+            }
+        }
+
+        private class ConfigCallback : AndroidJavaProxy
+        {
+            private readonly Action<string> _onSuccess;
+            private readonly Action<string> _onError;
+
+            public ConfigCallback(Action<string> onSuccess, Action<string> onError)
+                : base("com.vibegrowth.sdk.VibeGrowthSDK$ConfigCallback")
+            {
+                _onSuccess = onSuccess;
+                _onError = onError;
+            }
+
+            void onSuccess(string configJson)
+            {
+                UnityMainThreadDispatcher.Enqueue(() => _onSuccess?.Invoke(configJson));
+            }
+
             void onError(string error)
             {
                 UnityMainThreadDispatcher.Enqueue(() => _onError?.Invoke(error));

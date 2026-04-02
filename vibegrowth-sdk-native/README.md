@@ -1,8 +1,9 @@
 # Vibe Growth Native SDK
 
 Shared native Android (Kotlin) and iOS (Swift) layers for attribution, user
-identity, session tracking, and revenue tracking. These native libraries are
-consumed by the Flutter and Unity SDK plugins via source inclusion.
+identity, session tracking, revenue tracking, remote config fetches, and
+optional base URL overrides. These native libraries are consumed by the Flutter
+and Unity SDK plugins via source inclusion.
 
 ## Package Layout
 
@@ -61,6 +62,30 @@ Both Flutter and Unity use **source inclusion** (not prebuilt binaries):
 
 All endpoints are prefixed with `/api/sdk` and require a Bearer token in the `Authorization` header.
 
+## Version
+
+Current SDK version: `2.1.0`
+
+## Native Integration Notes
+
+The native SDK is distributed from this monorepo as source today. The supported
+integration path is to vendor the relevant source tree into a client app or
+mirror it into an internal package repository.
+
+### Android source inclusion
+
+- Add `vibegrowth-sdk-native/android` as a Gradle library module in the client app.
+- Depend on it with `implementation(project(":vibegrowth-sdk-android"))`.
+- See `examples/android/MyApplication.kt` for a minimal bootstrap.
+
+### iOS source inclusion
+
+- Add `vibegrowth-sdk-native/ios` as a local Swift Package in Xcode.
+- Import `VibeGrowthSDK` from the app bootstrap target.
+- See `examples/ios/AppDelegate.swift` for a minimal bootstrap.
+
+## Backend API Endpoints
+
 ### POST /api/sdk/init
 
 Initialize a device session.
@@ -77,7 +102,7 @@ Authorization: Bearer <api_key>
   "app_id": "your-app-id",
   "device_id": "uuid-device-id",
   "platform": "android",
-  "sdk_version": "1.0.0",
+  "sdk_version": "2.1.0",
   "attribution": { "install_referrer": "utm_source=google" }
 }
 ```
@@ -152,7 +177,7 @@ Authorization: Bearer <api_key>
 
 ### POST /api/sdk/session
 
-Track an app session.
+Track an app session start.
 
 **Headers:**
 ```
@@ -165,8 +190,9 @@ Authorization: Bearer <api_key>
 {
   "app_id": "your-app-id",
   "device_id": "uuid-device-id",
+  "user_id": "user-123",
   "session_start": "2026-01-01T00:00:00Z",
-  "session_duration_ms": 45000
+  "is_first_session": true
 }
 ```
 
@@ -193,3 +219,9 @@ Authorization: Bearer <api_key>
   "config": {}
 }
 ```
+
+## Examples
+
+- Android bootstrap: `examples/android/MyApplication.kt`
+- iOS bootstrap: `examples/ios/AppDelegate.swift`
+- Validation: `../../scripts/validate-sdks.sh`

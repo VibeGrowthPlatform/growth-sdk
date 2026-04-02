@@ -10,13 +10,15 @@ import Foundation
         super.init()
     }
 
-    @objc public func trackPurchase(amount: Double, currency: String, productId: String) {
-        let event: [String: Any] = [
+    @objc public func trackPurchase(pricePaid: Double, currency: String, productId: String? = nil) {
+        var event: [String: Any] = [
             "revenue_type": "purchase",
-            "amount": amount,
+            "amount": pricePaid,
             "currency": currency,
-            "product_id": productId
         ]
+        if let productId {
+            event["product_id"] = productId
+        }
         postRevenue(event: event)
     }
 

@@ -8,20 +8,23 @@ import java.net.URL
 
 class ApiClient(private val config: VibeGrowthConfig) {
 
-    fun post(path: String, body: JSONObject): String {
-        val url = URL("${config.baseUrl}$path")
+    private fun request(method: String, path: String, body: JSONObject? = null): String {
+        val normalizedBaseUrl = config.baseUrl.trimEnd('/')
+        val url = URL("$normalizedBaseUrl$path")
         val connection = url.openConnection() as HttpURLConnection
         try {
-            connection.requestMethod = "POST"
-            connection.setRequestProperty("Content-Type", "application/json")
+            connection.requestMethod = method
             connection.setRequestProperty("Authorization", "Bearer ${config.apiKey}")
             connection.connectTimeout = 10_000
             connection.readTimeout = 10_000
-            connection.doOutput = true
+            if (body != null) {
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.doOutput = true
 
-            OutputStreamWriter(connection.outputStream).use { writer ->
-                writer.write(body.toString())
-                writer.flush()
+                OutputStreamWriter(connection.outputStream).use { writer ->
+                    writer.write(body.toString())
+                    writer.flush()
+                }
             }
 
             val responseCode = connection.responseCode
@@ -33,6 +36,10 @@ class ApiClient(private val config: VibeGrowthConfig) {
         } finally {
             connection.disconnect()
         }
+    }
+
+    fun post(path: String, body: JSONObject): String {
+        return request("POST", path, body)
     }
 
     fun postInit(deviceId: String, platform: String, attribution: JSONObject?, sdkVersion: String): String {
@@ -66,13 +73,27 @@ class ApiClient(private val config: VibeGrowthConfig) {
         return post(ApiEndpoints.REVENUE, event)
     }
 
-    fun postSession(deviceId: String, sessionStart: String, sessionDurationMs: Int): String {
+    fun postSession(
+        deviceId: String,
+        userId: String?,
+        sessionStart: String,
+        isFirstSession: Boolean
+    ): String {
         val body = JSONObject().apply {
             put("app_id", config.appId)
             put("device_id", deviceId)
+            if (userId != null) {
+                put("user_id", userId)
+            }
             put("session_start", sessionStart)
-            put("session_duration_ms", sessionDurationMs)
+            put("is_first_session", isFirstSession)
         }
         return post(ApiEndpoints.SESSION, body)
+    }
+
+    fun getConfig(): JSONObject {
+        val response = request("GET", ApiEndpoints.CONFIG)
+        val payload = JSONObject(response)
+        return payload.optJSONObject("config") ?: JSONObject()
     }
 }

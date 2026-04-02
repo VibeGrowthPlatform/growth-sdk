@@ -28,11 +28,12 @@ class VibeGrowthSdkPlugin : FlutterPlugin, MethodCallHandler {
             "initialize" -> {
                 val appId = call.argument<String>("appId")
                 val apiKey = call.argument<String>("apiKey")
+                val baseUrl = call.argument<String>("baseUrl")
                 if (appId == null || apiKey == null) {
                     result.error("INVALID_ARGS", "appId and apiKey are required", null)
                     return
                 }
-                VibeGrowthSDK.initialize(context, appId, apiKey, object : VibeGrowthSDK.InitCallback {
+                VibeGrowthSDK.initialize(context, appId, apiKey, baseUrl, object : VibeGrowthSDK.InitCallback {
                     override fun onSuccess() {
                         result.success(null)
                     }
@@ -64,15 +65,15 @@ class VibeGrowthSdkPlugin : FlutterPlugin, MethodCallHandler {
                 }
             }
             "trackPurchase" -> {
-                val amount = call.argument<Double>("amount")
+                val pricePaid = call.argument<Double>("pricePaid") ?: call.argument<Double>("amount")
                 val currency = call.argument<String>("currency")
                 val productId = call.argument<String>("productId")
-                if (amount == null || currency == null || productId == null) {
-                    result.error("INVALID_ARGS", "amount, currency, and productId are required", null)
+                if (pricePaid == null || currency == null) {
+                    result.error("INVALID_ARGS", "pricePaid and currency are required", null)
                     return
                 }
                 try {
-                    VibeGrowthSDK.trackPurchase(amount, currency, productId)
+                    VibeGrowthSDK.trackPurchase(pricePaid, currency, productId)
                     result.success(null)
                 } catch (e: IllegalStateException) {
                     result.error("NOT_INITIALIZED", e.message, null)
@@ -93,16 +94,30 @@ class VibeGrowthSdkPlugin : FlutterPlugin, MethodCallHandler {
                     result.error("NOT_INITIALIZED", e.message, null)
                 }
             }
-            "trackSession" -> {
+            "trackSessionStart", "trackSession" -> {
                 val sessionStart = call.argument<String>("sessionStart")
-                val sessionDurationMs = call.argument<Int>("sessionDurationMs")
-                if (sessionStart == null || sessionDurationMs == null) {
-                    result.error("INVALID_ARGS", "sessionStart and sessionDurationMs are required", null)
+                if (sessionStart == null) {
+                    result.error("INVALID_ARGS", "sessionStart is required", null)
                     return
                 }
                 try {
-                    VibeGrowthSDK.trackSession(sessionStart, sessionDurationMs)
+                    VibeGrowthSDK.trackSessionStart(sessionStart)
                     result.success(null)
+                } catch (e: IllegalStateException) {
+                    result.error("NOT_INITIALIZED", e.message, null)
+                }
+            }
+            "getConfig" -> {
+                try {
+                    VibeGrowthSDK.getConfig(object : VibeGrowthSDK.ConfigCallback {
+                        override fun onSuccess(configJson: String) {
+                            result.success(configJson)
+                        }
+
+                        override fun onError(error: String) {
+                            result.error("CONFIG_ERROR", error, null)
+                        }
+                    })
                 } catch (e: IllegalStateException) {
                     result.error("NOT_INITIALIZED", e.message, null)
                 }

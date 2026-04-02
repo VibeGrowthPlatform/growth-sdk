@@ -10,8 +10,9 @@ class VibeGrowth {
   static Future<void> initialize({
     required String appId,
     required String apiKey,
+    String? baseUrl,
   }) {
-    return _channel.initialize(appId, apiKey);
+    return _channel.initialize(appId, apiKey, baseUrl);
   }
 
   static Future<void> setUserId(String userId) {
@@ -23,11 +24,11 @@ class VibeGrowth {
   }
 
   static Future<void> trackPurchase({
-    required double amount,
+    required double pricePaid,
     required String currency,
-    required String productId,
+    String? productId,
   }) {
-    return _channel.trackPurchase(amount, currency, productId);
+    return _channel.trackPurchase(pricePaid, currency, productId);
   }
 
   static Future<void> trackAdRevenue({
@@ -38,10 +39,21 @@ class VibeGrowth {
     return _channel.trackAdRevenue(source, revenue, currency);
   }
 
+  static Future<void> trackSessionStart({
+    required String sessionStart,
+  }) {
+    return _channel.trackSessionStart(sessionStart);
+  }
+
+  @Deprecated('Use trackSessionStart instead.')
   static Future<void> trackSession({
     required String sessionStart,
-    required int sessionDurationMs,
+    int? sessionDurationMs,
   }) {
-    return _channel.trackSession(sessionStart, sessionDurationMs);
+    return _channel.trackSessionStart(sessionStart);
+  }
+
+  static Future<Map<String, dynamic>> getConfig() {
+    return _channel.getConfig();
   }
 }

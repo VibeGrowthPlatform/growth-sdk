@@ -8,7 +8,13 @@ namespace VibeGrowth
         private static IVibeGrowthNativeBridge _bridge;
         private static bool _initialized;
 
-        public static void Initialize(string appId, string apiKey, Action onSuccess = null, Action<string> onError = null)
+        public static void Initialize(
+            string appId,
+            string apiKey,
+            Action onSuccess = null,
+            Action<string> onError = null,
+            string baseUrl = null
+        )
         {
             if (_initialized)
             {
@@ -24,7 +30,7 @@ namespace VibeGrowth
             _bridge = new VibeGrowthEditorBridge();
 #endif
 
-            _bridge.Initialize(appId, apiKey, () =>
+            _bridge.Initialize(appId, apiKey, baseUrl, () =>
             {
                 _initialized = true;
                 onSuccess?.Invoke();
@@ -46,10 +52,14 @@ namespace VibeGrowth
         public static void TrackPurchase(Dictionary<string, object> data)
         {
             CheckInitialized();
-            var amount = Convert.ToDouble(data["amount"]);
+            var pricePaid = data.ContainsKey("pricePaid")
+                ? Convert.ToDouble(data["pricePaid"])
+                : Convert.ToDouble(data["amount"]);
             var currency = (string)data["currency"];
-            var productId = (string)data["productId"];
-            _bridge.TrackPurchase(amount, currency, productId);
+            var productId = data.ContainsKey("productId")
+                ? data["productId"] as string
+                : null;
+            _bridge.TrackPurchase(pricePaid, currency, productId);
         }
 
         public static void TrackAdRevenue(Dictionary<string, object> data)
@@ -61,10 +71,22 @@ namespace VibeGrowth
             _bridge.TrackAdRevenue(source, revenue, currency);
         }
 
-        public static void TrackSession(string sessionStart, int sessionDurationMs)
+        public static void TrackSessionStart(string sessionStart)
         {
             CheckInitialized();
-            _bridge.TrackSession(sessionStart, sessionDurationMs);
+            _bridge.TrackSessionStart(sessionStart);
+        }
+
+        public static void TrackSession(string sessionStart, int sessionDurationMs)
+        {
+            _ = sessionDurationMs;
+            TrackSessionStart(sessionStart);
+        }
+
+        public static void GetConfig(Action<string> onSuccess, Action<string> onError = null)
+        {
+            CheckInitialized();
+            _bridge.GetConfig(onSuccess, onError);
         }
 
         private static void CheckInitialized()

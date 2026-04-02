@@ -3,15 +3,17 @@
 
 typedef void (*SuccessCallback)(void);
 typedef void (*ErrorCallback)(const char *error);
+typedef void (*ConfigSuccessCallback)(const char *configJson);
 
 extern "C" {
 
-    void _vibegrowth_initialize(const char *appId, const char *apiKey,
+    void _vibegrowth_initialize(const char *appId, const char *apiKey, const char *baseUrl,
                                SuccessCallback onSuccess, ErrorCallback onError) {
         NSString *nsAppId = [NSString stringWithUTF8String:appId];
         NSString *nsApiKey = [NSString stringWithUTF8String:apiKey];
+        NSString *nsBaseUrl = baseUrl != NULL ? [NSString stringWithUTF8String:baseUrl] : nil;
 
-        [[VibeGrowthSDK shared] initializeWithAppId:nsAppId apiKey:nsApiKey completion:^(BOOL success, NSString *error) {
+        [[VibeGrowthSDK shared] initializeWithAppId:nsAppId apiKey:nsApiKey baseUrl:nsBaseUrl completion:^(BOOL success, NSString *error) {
             if (success) {
                 if (onSuccess) {
                     onSuccess();
@@ -39,10 +41,10 @@ extern "C" {
         return strdup([userId UTF8String]);
     }
 
-    void _vibegrowth_trackPurchase(double amount, const char *currency, const char *productId) {
+    void _vibegrowth_trackPurchase(double pricePaid, const char *currency, const char *productId) {
         NSString *nsCurrency = [NSString stringWithUTF8String:currency];
-        NSString *nsProductId = [NSString stringWithUTF8String:productId];
-        [[VibeGrowthSDK shared] trackPurchaseWithAmount:amount currency:nsCurrency productId:nsProductId];
+        NSString *nsProductId = productId != NULL ? [NSString stringWithUTF8String:productId] : nil;
+        [[VibeGrowthSDK shared] trackPurchaseWithPricePaid:pricePaid currency:nsCurrency productId:nsProductId];
     }
 
     void _vibegrowth_trackAdRevenue(const char *source, double revenue, const char *currency) {
@@ -51,9 +53,25 @@ extern "C" {
         [[VibeGrowthSDK shared] trackAdRevenueWithSource:nsSource revenue:revenue currency:nsCurrency];
     }
 
-    void _vibegrowth_trackSession(const char *sessionStart, int sessionDurationMs) {
+    void _vibegrowth_trackSessionStart(const char *sessionStart) {
         NSString *nsSessionStart = [NSString stringWithUTF8String:sessionStart];
-        [[VibeGrowthSDK shared] trackSessionWithSessionStart:nsSessionStart sessionDurationMs:sessionDurationMs];
+        [[VibeGrowthSDK shared] trackSessionStartWithSessionStart:nsSessionStart];
+    }
+
+    void _vibegrowth_getConfig(ConfigSuccessCallback onSuccess, ErrorCallback onError) {
+        [[VibeGrowthSDK shared] getConfigWithCompletion:^(NSString *configJson, NSString *error) {
+            if (configJson != nil) {
+                if (onSuccess) {
+                    const char *configStr = strdup([configJson UTF8String]);
+                    onSuccess(configStr);
+                    free((void *)configStr);
+                }
+            } else if (onError) {
+                const char *errorStr = error ? strdup([error UTF8String]) : strdup("Unknown error");
+                onError(errorStr);
+                free((void *)errorStr);
+            }
+        }];
     }
 
 }

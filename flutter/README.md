@@ -2,6 +2,8 @@
 
 Flutter plugin for attribution, user identity, session tracking, and revenue tracking.
 
+**Version:** 2.1.0
+
 **Requirements:** Dart >= 3.0.0, Flutter >= 3.10.0, Android minSdk 21, iOS 14+
 
 ## Installation
@@ -10,7 +12,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  vibegrowth_sdk: 1.0.0
+  vibegrowth_sdk: ^2.1.0
 ```
 
 Then run:
@@ -33,6 +35,7 @@ import 'package:vibegrowth_sdk/vibegrowth_sdk.dart';
 await VibeGrowth.initialize(
   appId: 'your-app-id',
   apiKey: 'your-api-key',
+  baseUrl: 'https://api.vibegrowth.com',
 );
 ```
 
@@ -52,9 +55,8 @@ String? userId = await VibeGrowth.getUserId();
 
 ```dart
 await VibeGrowth.trackPurchase(
-  amount: 4.99,
+  pricePaid: 4.99,
   currency: 'USD',
-  productId: 'com.example.gems_pack',
 );
 ```
 
@@ -68,11 +70,22 @@ await VibeGrowth.trackAdRevenue(
 );
 ```
 
-### Track Session
+### Track Session Start
 
 ```dart
-await VibeGrowth.trackSession(
+await VibeGrowth.trackSessionStart(
   sessionStart: '2026-01-01T00:00:00Z',
-  sessionDurationMs: 45000,
 );
 ```
+
+### Fetch Remote Config
+
+```dart
+final config = await VibeGrowth.getConfig();
+```
+
+## Development
+
+- Example app: `example/`
+- Tests: `flutter test`
+- Static analysis: `flutter analyze`

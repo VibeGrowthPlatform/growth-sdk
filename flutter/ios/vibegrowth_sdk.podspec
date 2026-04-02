@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'vibegrowth_sdk'
-  s.version          = '1.0.0'
+  s.version          = '2.1.0'
   s.summary          = 'Vibe Growth SDK for Flutter - iOS platform bridge.'
   s.description      = 'Vibe Growth SDK Flutter plugin iOS implementation with attribution, user identity, and revenue tracking.'
   s.homepage         = 'https://vibegrowth.com'

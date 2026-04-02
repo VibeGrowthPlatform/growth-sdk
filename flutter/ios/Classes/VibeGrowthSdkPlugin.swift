@@ -1,6 +1,8 @@
 import Flutter
+import Foundation
 
 public class VibeGrowthSdkPlugin: NSObject, FlutterPlugin {
+    private var isInitialized = false
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "com.vibegrowth.sdk/channel", binaryMessenger: registrar.messenger())
@@ -18,8 +20,10 @@ public class VibeGrowthSdkPlugin: NSObject, FlutterPlugin {
                 result(FlutterError(code: "INVALID_ARGS", message: "appId and apiKey are required", details: nil))
                 return
             }
-            VibeGrowthSDK.shared.initialize(appId: appId, apiKey: apiKey) { success, error in
+            let baseUrl = args?["baseUrl"] as? String
+            VibeGrowthSDK.shared.initialize(appId: appId, apiKey: apiKey, baseUrl: baseUrl) { [weak self] success, error in
                 if success {
+                    self?.isInitialized = true
                     result(nil)
                 } else {
                     result(FlutterError(code: "INIT_ERROR", message: error, details: nil))
@@ -27,6 +31,7 @@ public class VibeGrowthSdkPlugin: NSObject, FlutterPlugin {
             }
 
         case "setUserId":
+            guard ensureInitialized(result) else { return }
             guard let userId = args?["userId"] as? String else {
                 result(FlutterError(code: "INVALID_ARGS", message: "userId is required", details: nil))
                 return
@@ -35,20 +40,24 @@ public class VibeGrowthSdkPlugin: NSObject, FlutterPlugin {
             result(nil)
 
         case "getUserId":
+            guard ensureInitialized(result) else { return }
             let userId = VibeGrowthSDK.shared.getUserId()
             result(userId)
 
         case "trackPurchase":
-            guard let amount = args?["amount"] as? Double,
-                  let currency = args?["currency"] as? String,
-                  let productId = args?["productId"] as? String else {
-                result(FlutterError(code: "INVALID_ARGS", message: "amount, currency, and productId are required", details: nil))
+            guard ensureInitialized(result) else { return }
+            let pricePaid = (args?["pricePaid"] as? Double) ?? (args?["amount"] as? Double)
+            guard let pricePaid,
+                  let currency = args?["currency"] as? String else {
+                result(FlutterError(code: "INVALID_ARGS", message: "pricePaid and currency are required", details: nil))
                 return
             }
-            VibeGrowthSDK.shared.trackPurchase(amount: amount, currency: currency, productId: productId)
+            let productId = args?["productId"] as? String
+            VibeGrowthSDK.shared.trackPurchase(pricePaid: pricePaid, currency: currency, productId: productId)
             result(nil)
 
         case "trackAdRevenue":
+            guard ensureInitialized(result) else { return }
             guard let source = args?["source"] as? String,
                   let revenue = args?["revenue"] as? Double,
                   let currency = args?["currency"] as? String else {
@@ -58,17 +67,35 @@ public class VibeGrowthSdkPlugin: NSObject, FlutterPlugin {
             VibeGrowthSDK.shared.trackAdRevenue(source: source, revenue: revenue, currency: currency)
             result(nil)
 
-        case "trackSession":
-            guard let sessionStart = args?["sessionStart"] as? String,
-                  let sessionDurationMs = args?["sessionDurationMs"] as? Int else {
-                result(FlutterError(code: "INVALID_ARGS", message: "sessionStart and sessionDurationMs are required", details: nil))
+        case "trackSessionStart", "trackSession":
+            guard ensureInitialized(result) else { return }
+            guard let sessionStart = args?["sessionStart"] as? String else {
+                result(FlutterError(code: "INVALID_ARGS", message: "sessionStart is required", details: nil))
                 return
             }
-            VibeGrowthSDK.shared.trackSession(sessionStart: sessionStart, sessionDurationMs: sessionDurationMs)
+            VibeGrowthSDK.shared.trackSessionStart(sessionStart: sessionStart)
             result(nil)
+
+        case "getConfig":
+            guard ensureInitialized(result) else { return }
+            VibeGrowthSDK.shared.getConfig { configJson, error in
+                if let error {
+                    result(FlutterError(code: "CONFIG_ERROR", message: error, details: nil))
+                } else {
+                    result(configJson)
+                }
+            }
 
         default:
             result(FlutterMethodNotImplemented)
         }
+    }
+
+    private func ensureInitialized(_ result: FlutterResult) -> Bool {
+        guard isInitialized else {
+            result(FlutterError(code: "NOT_INITIALIZED", message: "VibeGrowthSDK is not initialized. Call initialize() first.", details: nil))
+            return false
+        }
+        return true
     }
 }

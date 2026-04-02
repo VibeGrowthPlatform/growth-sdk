@@ -10,12 +10,14 @@ class RevenueTracker(
     private val identityManager: UserIdentityManager
 ) {
 
-    fun trackPurchase(amount: Double, currency: String, productId: String) {
+    fun trackPurchase(pricePaid: Double, currency: String, productId: String? = null) {
         val event = JSONObject().apply {
             put("revenue_type", "purchase")
-            put("amount", amount)
+            put("amount", pricePaid)
             put("currency", currency)
-            put("product_id", productId)
+            if (productId != null) {
+                put("product_id", productId)
+            }
         }
         postRevenue(event)
     }

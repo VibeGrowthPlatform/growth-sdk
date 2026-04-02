@@ -1,13 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 
 class VibeGrowthMethodChannel {
   static const MethodChannel _channel =
       MethodChannel('com.vibegrowth.sdk/channel');
 
-  Future<void> initialize(String appId, String apiKey) {
+  Future<void> initialize(String appId, String apiKey, [String? baseUrl]) {
     return _channel.invokeMethod<void>('initialize', <String, dynamic>{
       'appId': appId,
       'apiKey': apiKey,
+      if (baseUrl != null) 'baseUrl': baseUrl,
     });
   }
 
@@ -21,11 +24,15 @@ class VibeGrowthMethodChannel {
     return _channel.invokeMethod<String?>('getUserId');
   }
 
-  Future<void> trackPurchase(double amount, String currency, String productId) {
+  Future<void> trackPurchase(
+    double pricePaid,
+    String currency, [
+    String? productId,
+  ]) {
     return _channel.invokeMethod<void>('trackPurchase', <String, dynamic>{
-      'amount': amount,
+      'pricePaid': pricePaid,
       'currency': currency,
-      'productId': productId,
+      if (productId != null) 'productId': productId,
     });
   }
 
@@ -37,10 +44,25 @@ class VibeGrowthMethodChannel {
     });
   }
 
-  Future<void> trackSession(String sessionStart, int sessionDurationMs) {
-    return _channel.invokeMethod<void>('trackSession', <String, dynamic>{
+  Future<void> trackSessionStart(String sessionStart) {
+    return _channel.invokeMethod<void>('trackSessionStart', <String, dynamic>{
       'sessionStart': sessionStart,
-      'sessionDurationMs': sessionDurationMs,
     });
+  }
+
+  Future<Map<String, dynamic>> getConfig() async {
+    final json = await _channel.invokeMethod<String>('getConfig');
+    if (json == null || json.isEmpty) {
+      return <String, dynamic>{};
+    }
+
+    final decoded = jsonDecode(json);
+    if (decoded is Map) {
+      return decoded.map(
+        (key, value) => MapEntry(key.toString(), value),
+      );
+    }
+
+    return <String, dynamic>{};
   }
 }

@@ -2,6 +2,8 @@
 
 Unity plugin for attribution, user identity, session tracking, and revenue tracking.
 
+**Version:** 2.1.0
+
 **Requirements:** Unity 2021.3+, Android minSdk 21, iOS 14+
 
 ## Installation
@@ -11,7 +13,7 @@ Add to your `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.vibegrowth.sdk": "https://github.com/vibegrowth/vibegrowth-sdk-unity.git"
+    "com.vibegrowth.sdk": "https://github.com/vibegrowth/vibegrowth-sdk-unity.git#v2.1.0"
   }
 }
 ```
@@ -35,7 +37,8 @@ VibeGrowthSDK.Initialize(
     },
     onError: (error) => {
         Debug.LogError("Init failed: " + error);
-    }
+    },
+    baseUrl: "https://api.vibegrowth.com"
 );
 ```
 
@@ -55,7 +58,7 @@ string userId = VibeGrowthSDK.GetUserId();
 
 ```csharp
 VibeGrowthSDK.TrackPurchase(new Dictionary<string, object> {
-    { "amount", 4.99 },
+    { "pricePaid", 4.99 },
     { "currency", "USD" },
     { "productId", "com.example.gems_pack" }
 });
@@ -71,8 +74,22 @@ VibeGrowthSDK.TrackAdRevenue(new Dictionary<string, object> {
 });
 ```
 
-### Track Session
+### Track Session Start
 
 ```csharp
-VibeGrowthSDK.TrackSession("2026-01-01T00:00:00Z", 45000);
+VibeGrowthSDK.TrackSessionStart("2026-01-01T00:00:00Z");
 ```
+
+### Fetch Remote Config
+
+```csharp
+VibeGrowthSDK.GetConfig(
+    onSuccess: (configJson) => Debug.Log("Config: " + configJson),
+    onError: (error) => Debug.LogError("Config failed: " + error)
+);
+```
+
+## Development
+
+- Sample integration: `Samples~/BasicIntegration/`
+- Runtime code is backed by vendored native sources from `../vibegrowth-sdk-native/`.

@@ -10,14 +10,20 @@ import org.json.JSONObject
 import kotlin.concurrent.thread
 
 object VibeGrowthSDK {
+    private const val KEY_HAS_TRACKED_FIRST_SESSION = "has_tracked_first_session"
 
     interface InitCallback {
         fun onSuccess()
         fun onError(error: String)
     }
 
+    interface ConfigCallback {
+        fun onSuccess(configJson: String)
+        fun onError(error: String)
+    }
+
     private const val PLATFORM = "android"
-    private const val SDK_VERSION = "1.0.0"
+    private const val SDK_VERSION = "2.1.0"
 
     private var isInitialized = false
     private lateinit var config: VibeGrowthConfig
@@ -28,13 +34,27 @@ object VibeGrowthSDK {
     private lateinit var referrerHelper: InstallReferrerHelper
 
     fun initialize(context: Context, appId: String, apiKey: String, callback: InitCallback? = null) {
+        initialize(context, appId, apiKey, null, callback)
+    }
+
+    fun initialize(
+        context: Context,
+        appId: String,
+        apiKey: String,
+        baseUrl: String?,
+        callback: InitCallback? = null
+    ) {
         if (isInitialized) {
             callback?.onSuccess()
             return
         }
 
         val appContext = context.applicationContext
-        config = VibeGrowthConfig(appId = appId, apiKey = apiKey)
+        config = if (baseUrl.isNullOrBlank()) {
+            VibeGrowthConfig(appId = appId, apiKey = apiKey)
+        } else {
+            VibeGrowthConfig(appId = appId, apiKey = apiKey, baseUrl = baseUrl)
+        }
         apiClient = ApiClient(config)
         prefsStore = PreferencesStore(appContext)
         identityManager = UserIdentityManager(prefsStore, appContext)
@@ -80,9 +100,10 @@ object VibeGrowthSDK {
         return identityManager.getUserId()
     }
 
-    fun trackPurchase(amount: Double, currency: String, productId: String) {
+    @JvmOverloads
+    fun trackPurchase(pricePaid: Double, currency: String, productId: String? = null) {
         checkInitialized()
-        revenueTracker.trackPurchase(amount, currency, productId)
+        revenueTracker.trackPurchase(pricePaid, currency, productId)
     }
 
     fun trackAdRevenue(source: String, revenue: Double, currency: String) {
@@ -90,14 +111,35 @@ object VibeGrowthSDK {
         revenueTracker.trackAdRevenue(source, revenue, currency)
     }
 
-    fun trackSession(sessionStart: String, sessionDurationMs: Int) {
+    fun trackSessionStart(sessionStart: String) {
         checkInitialized()
         thread {
             try {
                 val deviceId = identityManager.getOrCreateDeviceId()
-                apiClient.postSession(deviceId, sessionStart, sessionDurationMs)
+                val userId = identityManager.getUserId()
+                val isFirstSession = !prefsStore.getBoolean(KEY_HAS_TRACKED_FIRST_SESSION)
+                apiClient.postSession(deviceId, userId, sessionStart, isFirstSession)
+                if (isFirstSession) {
+                    prefsStore.putBoolean(KEY_HAS_TRACKED_FIRST_SESSION, true)
+                }
             } catch (_: Exception) {
                 // Silently handle network errors for session tracking
+            }
+        }
+    }
+
+    fun trackSession(sessionStart: String, @Suppress("UNUSED_PARAMETER") sessionDurationMs: Int) {
+        trackSessionStart(sessionStart)
+    }
+
+    fun getConfig(callback: ConfigCallback) {
+        checkInitialized()
+        thread {
+            try {
+                val configJson = apiClient.getConfig().toString()
+                callback.onSuccess(configJson)
+            } catch (e: Exception) {
+                callback.onError(e.message ?: "Unknown error")
             }
         }
     }

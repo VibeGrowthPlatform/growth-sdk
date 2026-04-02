@@ -15,4 +15,12 @@ import Foundation
     @objc public func putString(_ key: String, value: String) {
         defaults.set(value, forKey: key)
     }
+
+    @objc public func getBool(_ key: String) -> Bool {
+        return defaults.bool(forKey: key)
+    }
+
+    @objc public func putBool(_ key: String, value: Bool) {
+        defaults.set(value, forKey: key)
+    }
 }
