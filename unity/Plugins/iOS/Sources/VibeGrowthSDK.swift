@@ -1,11 +1,15 @@
 import Foundation
+import StoreKit
 
 @objc public class VibeGrowthSDK: NSObject {
     @objc public static let shared = VibeGrowthSDK()
 
+    private static let storeSuiteName = "com.vibegrowth.sdk"
     private static let platform = "ios"
     private static let sdkVersion = "2.1.0"
     private static let firstSessionKey = "vibegrowth_has_tracked_first_session"
+
+    internal static var attributionProviderForTests: (() -> [String: Any])?
 
     private var isInitialized = false
     private var config: VibeGrowthConfig?
@@ -13,18 +17,43 @@ import Foundation
     private var identityManager: UserIdentityManager?
     private var revenueTracker: RevenueTracker?
     private var store: UserDefaultsStore?
+    private let sessionTrackingLock = NSLock()
+    private var sk1Observer: StoreKitPurchaseObserver?
+    private var sk2Observer: Any?
 
     private override init() {
         super.init()
     }
 
+    internal func resetForTests() {
+        isInitialized = false
+        config = nil
+        apiClient = nil
+        identityManager = nil
+        revenueTracker = nil
+        store = nil
+        sk1Observer?.stopObserving()
+        sk1Observer = nil
+        if #available(iOS 15, *) {
+            (sk2Observer as? StoreKit2PurchaseObserver)?.stopObserving()
+        }
+        sk2Observer = nil
+        VibeGrowthSDK.attributionProviderForTests = nil
+        UserDefaults(suiteName: VibeGrowthSDK.storeSuiteName)?.removePersistentDomain(forName: VibeGrowthSDK.storeSuiteName)
+    }
+
     @objc(initializeWithAppId:apiKey:completion:)
     public func initialize(appId: String, apiKey: String, completion: ((Bool, String?) -> Void)? = nil) {
-        initialize(appId: appId, apiKey: apiKey, baseUrl: nil, completion: completion)
+        initialize(appId: appId, apiKey: apiKey, baseUrl: nil, autoTrackPurchases: true, completion: completion)
     }
 
     @objc(initializeWithAppId:apiKey:baseUrl:completion:)
     public func initialize(appId: String, apiKey: String, baseUrl: String?, completion: ((Bool, String?) -> Void)? = nil) {
+        initialize(appId: appId, apiKey: apiKey, baseUrl: baseUrl, autoTrackPurchases: true, completion: completion)
+    }
+
+    @objc(initializeWithAppId:apiKey:baseUrl:autoTrackPurchases:completion:)
+    public func initialize(appId: String, apiKey: String, baseUrl: String?, autoTrackPurchases: Bool, completion: ((Bool, String?) -> Void)? = nil) {
         if isInitialized {
             completion?(true, nil)
             return
@@ -32,9 +61,9 @@ import Foundation
 
         let config: VibeGrowthConfig
         if let baseUrl, !baseUrl.isEmpty {
-            config = VibeGrowthConfig(appId: appId, apiKey: apiKey, baseUrl: baseUrl)
+            config = VibeGrowthConfig(appId: appId, apiKey: apiKey, baseUrl: baseUrl, autoTrackPurchases: autoTrackPurchases)
         } else {
-            config = VibeGrowthConfig(appId: appId, apiKey: apiKey)
+            config = VibeGrowthConfig(appId: appId, apiKey: apiKey, autoTrackPurchases: autoTrackPurchases)
         }
         let apiClient = ApiClient(config: config)
         let store = UserDefaultsStore()
@@ -49,7 +78,7 @@ import Foundation
 
         DispatchQueue.global(qos: .background).async {
             let deviceId = identityManager.getOrCreateDeviceId()
-            let attribution = AdServicesHelper.getAttribution()
+            let attribution = VibeGrowthSDK.attributionProviderForTests?() ?? AdServicesHelper.getAttribution()
 
             apiClient.postInit(
                 deviceId: deviceId,
@@ -60,6 +89,9 @@ import Foundation
                 guard let self = self else { return }
                 if success {
                     self.isInitialized = true
+                    if config.autoTrackPurchases {
+                        self.startPurchaseObservers(revenueTracker: revenueTracker)
+                    }
                 }
                 DispatchQueue.main.async {
                     if success {
@@ -111,18 +143,27 @@ import Foundation
             let store = store
         else { return }
 
+        sessionTrackingLock.lock()
+        let hasTrackedFirstSession = store.getBool(VibeGrowthSDK.firstSessionKey)
+        if !hasTrackedFirstSession {
+            store.putBool(VibeGrowthSDK.firstSessionKey, value: true)
+        }
+        sessionTrackingLock.unlock()
+        let isFirstSession = !hasTrackedFirstSession
+
         DispatchQueue.global(qos: .background).async {
             let deviceId = identityManager.getOrCreateDeviceId()
             let userId = identityManager.getUserId()
-            let isFirstSession = !store.getBool(VibeGrowthSDK.firstSessionKey)
             apiClient.postSession(
                 deviceId: deviceId,
                 userId: userId,
                 sessionStart: sessionStart,
                 isFirstSession: isFirstSession
             ) { success, _ in
-                if success && isFirstSession {
-                    store.putBool(VibeGrowthSDK.firstSessionKey, value: true)
+                if !success, isFirstSession {
+                    self.sessionTrackingLock.lock()
+                    store.putBool(VibeGrowthSDK.firstSessionKey, value: false)
+                    self.sessionTrackingLock.unlock()
                 }
             }
         }
@@ -145,6 +186,18 @@ import Foundation
             DispatchQueue.main.async {
                 completion?(configJson, error)
             }
+        }
+    }
+
+    private func startPurchaseObservers(revenueTracker: RevenueTracker) {
+        if #available(iOS 15, *) {
+            let observer = StoreKit2PurchaseObserver(revenueTracker: revenueTracker)
+            observer.startObserving()
+            sk2Observer = observer
+        } else {
+            let observer = StoreKitPurchaseObserver(revenueTracker: revenueTracker)
+            observer.startObserving()
+            sk1Observer = observer
         }
     }
 

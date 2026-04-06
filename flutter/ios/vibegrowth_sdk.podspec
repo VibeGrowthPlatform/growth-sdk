@@ -12,6 +12,7 @@ Pod::Spec.new do |s|
   s.swift_version    = '5.0'
   s.dependency 'Flutter'
 
+  s.frameworks = 'StoreKit'
   s.weak_framework = 'AdServices'
 
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
