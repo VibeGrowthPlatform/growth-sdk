@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - vibegrowth_sdk (2.1.0):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - vibegrowth_sdk (from `.symlinks/plugins/vibegrowth_sdk/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  vibegrowth_sdk:
+    :path: ".symlinks/plugins/vibegrowth_sdk/ios"
+
+SPEC CHECKSUMS:
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  vibegrowth_sdk: 9c23b5a8a02e3ed176fde71ec12c00ed88be76f0
+
+PODFILE CHECKSUM: e30f02f9d1c72c47bb6344a0a748c9d268180865
+
+COCOAPODS: 1.16.2

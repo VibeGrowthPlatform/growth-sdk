@@ -3,6 +3,7 @@ import Foundation
 
 public class VibeGrowthSdkPlugin: NSObject, FlutterPlugin {
     private var isInitialized = false
+    private let exampleBaseUrlKey = "example.last_base_url"
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "com.vibegrowth.sdk/channel", binaryMessenger: registrar.messenger())
@@ -85,6 +86,16 @@ public class VibeGrowthSdkPlugin: NSObject, FlutterPlugin {
                     result(configJson)
                 }
             }
+
+        case "setExampleBaseUrl":
+            let baseUrl = (args?["baseUrl"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let store = UserDefaultsStore()
+            store.putString(exampleBaseUrlKey, value: baseUrl)
+            result(nil)
+
+        case "getExampleBaseUrl":
+            let store = UserDefaultsStore()
+            result(store.getString(exampleBaseUrlKey))
 
         default:
             result(FlutterMethodNotImplemented)

@@ -2,6 +2,7 @@ package com.vibegrowth.sdk.flutter
 
 import android.content.Context
 import com.vibegrowth.sdk.VibeGrowthSDK
+import com.vibegrowth.sdk.persistence.PreferencesStore
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -9,6 +10,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
 class VibeGrowthSdkPlugin : FlutterPlugin, MethodCallHandler {
+    private val exampleBaseUrlKey = "example.last_base_url"
 
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
@@ -121,6 +123,14 @@ class VibeGrowthSdkPlugin : FlutterPlugin, MethodCallHandler {
                 } catch (e: IllegalStateException) {
                     result.error("NOT_INITIALIZED", e.message, null)
                 }
+            }
+            "setExampleBaseUrl" -> {
+                val baseUrl = call.argument<String>("baseUrl")?.trim() ?: ""
+                PreferencesStore(context).putString(exampleBaseUrlKey, baseUrl)
+                result.success(null)
+            }
+            "getExampleBaseUrl" -> {
+                result.success(PreferencesStore(context).getString(exampleBaseUrlKey))
             }
             else -> result.notImplemented()
         }
