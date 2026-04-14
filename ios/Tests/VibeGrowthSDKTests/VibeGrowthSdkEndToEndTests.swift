@@ -38,7 +38,7 @@ final class VibeGrowthSdkEndToEndTests: XCTestCase {
 
         let initExpectation = expectation(description: "initialize")
         var initError: String?
-        VibeGrowthSDK.shared.initialize(appId: appId, apiKey: apiKey, baseUrl: sdkBaseUrl) { success, error in
+        VibeGrowthSDK.shared.initialize(appId: appId, apiKey: apiKey, baseUrl: sdkBaseUrl, autoTrackPurchases: false) { success, error in
             if !success {
                 initError = error
             }

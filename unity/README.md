@@ -92,4 +92,22 @@ VibeGrowthSDK.GetConfig(
 ## Development
 
 - Sample integration: `Samples~/BasicIntegration/`
+- Runnable real-backend example: `Examples~/UnityPlayerE2E/`
 - Runtime code is backed by vendored native sources from `../vibegrowth-sdk-native/`.
+
+### Real-Backend E2E
+
+From the repo root, run:
+
+```bash
+bash scripts/validate-sdks.sh --e2e
+```
+
+This prepares the local backend stack, seeds the SDK E2E app, builds and runs
+the Unity example player app, and verifies the resulting device, revenue,
+session, and config state through ClickHouse and the SDK config endpoint. To run
+only the Unity portion after bootstrap:
+
+```bash
+vibegrowth-sdk-unity/Examples~/UnityPlayerE2E/scripts/run_player_e2e.sh
+```

@@ -82,7 +82,7 @@ PY
 
 prepare_sdk_e2e_env() {
     bold "→ SDK e2e backend stack"
-    if docker compose up -d --build postgres clickhouse redis backend; then
+    if docker compose up -d --build --force-recreate postgres clickhouse redis backend; then
         green "  ✓ SDK e2e backend stack passed"
     else
         red "  ✗ SDK e2e backend stack FAILED"
@@ -179,9 +179,13 @@ else
     echo
 fi
 
+if $RUN_E2E; then
+    run_step "Unity player app e2e" bash -c "cd '$ROOT' && vibegrowth-sdk-unity/Examples~/UnityPlayerE2E/scripts/run_player_e2e.sh"
+fi
+
 run_step "Vendored source sync" bash -c "
-  diff -rq '$ROOT/vibegrowth-sdk-native/android/src/main/kotlin/com/vibegrowth/sdk' '$ROOT/vibegrowth-sdk-unity/Plugins/Android/src/main/kotlin/com/vibegrowth/sdk' &&
-  diff -rq '$ROOT/vibegrowth-sdk-native/ios/Sources/VibeGrowthSDK' '$ROOT/vibegrowth-sdk-unity/Plugins/iOS/Sources' &&
+  diff -rq --exclude '*.meta' '$ROOT/vibegrowth-sdk-native/android/src/main/kotlin/com/vibegrowth/sdk' '$ROOT/vibegrowth-sdk-unity/Plugins/Android/src/main/kotlin/com/vibegrowth/sdk' &&
+  diff -rq --exclude '*.meta' '$ROOT/vibegrowth-sdk-native/ios/Sources/VibeGrowthSDK' '$ROOT/vibegrowth-sdk-unity/Plugins/iOS/Sources' &&
   diff -rq '$ROOT/vibegrowth-sdk-native/android/src/main/kotlin/com/vibegrowth/sdk' '$ROOT/vibegrowth-sdk-flutter/android/src/main/kotlin/com/vibegrowth/sdk' --exclude flutter &&
   diff -rq '$ROOT/vibegrowth-sdk-native/ios/Sources/VibeGrowthSDK' '$ROOT/vibegrowth-sdk-flutter/ios/Classes' --exclude VibeGrowthSdkPlugin.swift
 "
