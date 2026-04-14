@@ -11,9 +11,9 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import com.vibegrowth.sdk.VibeGrowthSDK
 import java.time.Instant
 import java.time.LocalTime
+import kotlin.concurrent.thread
 
 class MainActivity : Activity() {
     private lateinit var logView: TextView
@@ -40,61 +40,54 @@ class MainActivity : Activity() {
 
         // Subtitle with version info
         root.addView(TextView(this).apply {
-            text = "SDK v2.1.0 | Base URL: http://10.0.2.2:8000"
+            text = "SDK v2.1.0 | Control: http://127.0.0.1:${ExampleController.CONTROL_PORT}"
             textSize = 12f
             setTextColor(Color.GRAY)
             gravity = Gravity.CENTER
             setPadding(0, 0, 0, 24)
         })
 
+        addButton(root, "Initialize SDK") {
+            runCommand(
+                "initialize",
+                mapOf(
+                    "app_id" to ExampleController.DEFAULT_APP_ID,
+                    "api_key" to ExampleController.DEFAULT_API_KEY,
+                    "base_url" to ExampleController.DEFAULT_BASE_URL,
+                ),
+            )
+        }
+
         // Buttons for each SDK feature
         addButton(root, "Set User ID") {
             val userId = "user-${System.currentTimeMillis()}"
-            VibeGrowthSDK.setUserId(userId)
-            log("setUserId(\"$userId\")")
-            val retrieved = VibeGrowthSDK.getUserId()
-            log("getUserId() = $retrieved")
+            runCommand("set-user-id", mapOf("user_id" to userId))
         }
 
         addButton(root, "Get User ID") {
-            val userId = VibeGrowthSDK.getUserId()
-            log("getUserId() = $userId")
+            log("status = ${ExampleController.statusJson()}")
         }
 
         addButton(root, "Track Purchase") {
-            VibeGrowthSDK.trackPurchase(
-                pricePaid = 4.99,
-                currency = "USD",
-                productId = "gem_pack_100"
+            runCommand(
+                "track-purchase",
+                mapOf("amount" to "4.99", "currency" to "USD", "product_id" to "gem_pack_100"),
             )
-            log("trackPurchase(4.99, USD, gem_pack_100)")
         }
 
         addButton(root, "Track Ad Revenue") {
-            VibeGrowthSDK.trackAdRevenue(
-                source = "admob",
-                revenue = 0.02,
-                currency = "USD"
+            runCommand(
+                "track-ad-revenue",
+                mapOf("source" to "admob", "revenue" to "0.02", "currency" to "USD"),
             )
-            log("trackAdRevenue(admob, 0.02, USD)")
         }
 
         addButton(root, "Track Session Start") {
-            val now = Instant.now().toString()
-            VibeGrowthSDK.trackSessionStart(now)
-            log("trackSessionStart($now)")
+            runCommand("track-session-start", mapOf("session_start" to Instant.now().toString()))
         }
 
         addButton(root, "Get Config") {
-            log("getConfig() - requesting...")
-            VibeGrowthSDK.getConfig(object : VibeGrowthSDK.ConfigCallback {
-                override fun onSuccess(configJson: String) {
-                    runOnUiThread { log("getConfig() = $configJson") }
-                }
-                override fun onError(error: String) {
-                    runOnUiThread { log("getConfig() error: $error") }
-                }
-            })
+            runCommand("get-config", emptyMap())
         }
 
         addButton(root, "Clear Log") {
@@ -132,7 +125,8 @@ class MainActivity : Activity() {
         ))
 
         setContentView(root)
-        log("Activity created, SDK initializing from Application class")
+        log("Activity created; initialize with the button or host control script")
+        log("For emulator control, run: adb forward tcp:${ExampleController.CONTROL_PORT} tcp:${ExampleController.CONTROL_PORT}")
     }
 
     private fun addButton(parent: LinearLayout, label: String, onClick: () -> Unit) {
@@ -161,5 +155,16 @@ class MainActivity : Activity() {
         Log.d("VGExample", message)
         // Auto-scroll to bottom
         logScrollView.post { logScrollView.fullScroll(ScrollView.FOCUS_DOWN) }
+    }
+
+    private fun runCommand(name: String, params: Map<String, String>) {
+        thread(name = "VGExampleButtonCommand") {
+            val query = params.entries.joinToString("&") { "${it.key}=${it.value}" }
+            val rawUrl = if (query.isBlank()) "/$name" else "/$name?$query"
+            val result = ExampleController.executeCommand(name, params, rawUrl)
+            runOnUiThread {
+                log("$name -> ${result.optString("status")} ${result.optString("detail")}")
+            }
+        }
     }
 }

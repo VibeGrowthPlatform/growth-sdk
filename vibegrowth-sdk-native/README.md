@@ -76,7 +76,7 @@ mirror it into an internal package repository.
 
 - Add `vibegrowth-sdk-native/android` as a Gradle library module in the client app.
 - Depend on it with `implementation(project(":vibegrowth-sdk-android"))`.
-- See `examples/android/MyApplication.kt` for a minimal bootstrap.
+- See `examples/android/` for a runnable app with host-driven local backend validation.
 
 ### iOS source inclusion
 
@@ -222,6 +222,6 @@ Authorization: Bearer <api_key>
 
 ## Examples
 
-- Android bootstrap: `examples/android/MyApplication.kt`
+- Android example app and E2E validation: `examples/android/`
 - iOS bootstrap: `examples/ios/AppDelegate.swift`
 - Validation: `../../scripts/validate-sdks.sh`

@@ -82,7 +82,7 @@ PY
 
 prepare_sdk_e2e_env() {
     bold "→ SDK e2e backend stack"
-    if docker compose up -d postgres clickhouse redis backend; then
+    if docker compose up -d --build postgres clickhouse redis backend; then
         green "  ✓ SDK e2e backend stack passed"
     else
         red "  ✗ SDK e2e backend stack FAILED"
