@@ -82,7 +82,7 @@ mirror it into an internal package repository.
 
 - Add `vibegrowth-sdk-native/ios` as a local Swift Package in Xcode.
 - Import `VibeGrowthSDK` from the app bootstrap target.
-- See `examples/ios/AppDelegate.swift` for a minimal bootstrap.
+- See `examples/ios/VGExampleApp/VGExampleApp.swift` for a minimal SwiftUI bootstrap.
 
 ## Backend API Endpoints
 
@@ -223,5 +223,5 @@ Authorization: Bearer <api_key>
 ## Examples
 
 - Android example app and E2E validation: `examples/android/`
-- iOS bootstrap: `examples/ios/AppDelegate.swift`
+- iOS example app and E2E validation: `examples/ios/`
 - Validation: `../../scripts/validate-sdks.sh`

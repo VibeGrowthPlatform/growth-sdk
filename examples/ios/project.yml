@@ -18,6 +18,7 @@ targets:
     settings:
       base:
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads: YES
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
@@ -32,6 +33,9 @@ targets:
     platform: iOS
     sources:
       - VGExampleAppTests
+      - VGExampleApp/ExampleConfiguration.swift
+      - VGExampleApp/ExampleControlServer.swift
+      - VGExampleApp/ExampleViewModel.swift
     dependencies:
       - package: VibeGrowthSDK
     settings:
@@ -39,3 +43,12 @@ targets:
         SWIFT_VERSION: "5.9"
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.vibegrowth.example.VGExampleAppTests
+schemes:
+  VGExampleApp:
+    build:
+      targets:
+        VGExampleApp: all
+        VGExampleAppTests: [test]
+    test:
+      targets:
+        - VGExampleAppTests

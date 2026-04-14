@@ -6,16 +6,16 @@ import XCTest
 /// against the real local backend.
 ///
 /// Requires:
-///   - Backend running at http://[::1]:8000
-///   - ClickHouse running at http://[::1]:8123
+///   - Backend running at http://127.0.0.1:8000
+///   - ClickHouse running at http://127.0.0.1:8123
 ///   - Seeded e2e app (sm_app_sdk_e2e / sk_live_sdk_e2e_local_only)
 ///
 /// Enable by placing /tmp/vibegrowth-sdk-e2e.json with {"enabled": true, ...}
 /// or setting VIBEGROWTH_SDK_E2E=1 environment variable.
 final class ExampleAppEndToEndTest: XCTestCase {
 
-    private var baseUrl: String { loadField("baseUrl") ?? "http://[::1]:8000" }
-    private var chUrl: String { loadField("clickHouseUrl") ?? "http://[::1]:8123" }
+    private var baseUrl: String { ExampleConfiguration.simulatorLoopbackUrl(loadField("baseUrl") ?? "http://127.0.0.1:8000") }
+    private var chUrl: String { ExampleConfiguration.simulatorLoopbackUrl(loadField("clickHouseUrl") ?? "http://127.0.0.1:8123") }
     private var chDb: String { loadField("clickHouseDatabase") ?? "scalemonk" }
     private var appId: String { loadField("appId") ?? "sm_app_sdk_e2e" }
     private var apiKey: String { loadField("apiKey") ?? "sk_live_sdk_e2e_local_only" }
@@ -40,19 +40,21 @@ final class ExampleAppEndToEndTest: XCTestCase {
         let deviceId = "example-ios-\(UUID().uuidString)"
         let userId = "example-user-\(UUID().uuidString)"
         let productId = "example-product-\(UUID().uuidString)"
+        let viewModel = ExampleViewModel()
 
         // Pre-set device ID
         UserDefaults(suiteName: "com.vibegrowth.sdk")?.set(deviceId, forKey: "vibegrowth_device_id")
 
-        // 1. Initialize (same as VGExampleApp.init)
+        // 1. Initialize through the same integration layer used by VGExampleApp.
         let initExp = expectation(description: "init")
         var initError: String?
-        VibeGrowthSDK.shared.initialize(appId: appId, apiKey: apiKey, baseUrl: baseUrl) { success, error in
+        viewModel.initialize(appId: appId, apiKey: apiKey, baseUrl: baseUrl) { success, error in
             if !success { initError = error }
             initExp.fulfill()
         }
         wait(for: [initExp], timeout: 20)
         XCTAssertNil(initError, "Init failed: \(initError ?? "")")
+        XCTAssertEqual(viewModel.initStatus, "ready")
 
         // Verify device registered
         try eventuallyEquals("ios", query: """
@@ -62,8 +64,8 @@ final class ExampleAppEndToEndTest: XCTestCase {
         """)
 
         // 2. Set User ID (same as "Set User ID" button)
-        VibeGrowthSDK.shared.setUserId(userId)
-        XCTAssertEqual(VibeGrowthSDK.shared.getUserId(), userId)
+        viewModel.setUserId(userId)
+        XCTAssertEqual(viewModel.userId, userId)
 
         try eventuallyEquals(userId, query: """
             SELECT ifNull(user_id, '') FROM devices FINAL
@@ -72,7 +74,7 @@ final class ExampleAppEndToEndTest: XCTestCase {
         """)
 
         // 3. Track Purchase (same as "Track Purchase" button)
-        VibeGrowthSDK.shared.trackPurchase(pricePaid: 4.99, currency: "USD", productId: productId)
+        viewModel.trackPurchase(pricePaid: 4.99, currency: "USD", productId: productId)
 
         try eventuallyEquals(productId, query: """
             SELECT ifNull(product_id, '') FROM revenue_events
@@ -81,7 +83,7 @@ final class ExampleAppEndToEndTest: XCTestCase {
         """)
 
         // 4. Track Ad Revenue (same as "Track Ad Revenue" button)
-        VibeGrowthSDK.shared.trackAdRevenue(source: "admob", revenue: 0.02, currency: "USD")
+        viewModel.trackAdRevenue(source: "admob", revenue: 0.02, currency: "USD")
 
         try eventuallyEquals("ad_revenue", query: """
             SELECT revenue_type FROM revenue_events
@@ -90,7 +92,7 @@ final class ExampleAppEndToEndTest: XCTestCase {
         """)
 
         // 5. Track Session (same as "Track Session Start" button)
-        VibeGrowthSDK.shared.trackSessionStart(sessionStart: "2026-04-06T10:00:00+00:00")
+        viewModel.trackSessionStart(sessionStart: "2026-04-06T10:00:00+00:00")
 
         try eventuallyEquals("1", query: """
             SELECT count() FROM session_events
@@ -100,16 +102,14 @@ final class ExampleAppEndToEndTest: XCTestCase {
 
         // 6. Get Config (same as "Get Config" button)
         let configExp = expectation(description: "config")
-        var configJson: String?
         var configError: String?
-        VibeGrowthSDK.shared.getConfig { value, error in
-            configJson = value
+        viewModel.getConfig { _, error in
             configError = error
             configExp.fulfill()
         }
         wait(for: [configExp], timeout: 20)
         XCTAssertNil(configError)
-        XCTAssertEqual(configJson, "{}")
+        XCTAssertEqual(viewModel.configJson, "{}")
     }
 
     // MARK: - Helpers

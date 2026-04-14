@@ -30,9 +30,20 @@ struct ContentView: View {
             Text("SDK v2.1.0")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            Text("Base URL: http://localhost:8000")
+            Text("Init: \(viewModel.initStatus)")
                 .font(.caption2)
                 .foregroundColor(.secondary)
+            Text("Base URL: \(viewModel.baseUrl)")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            Text("Control: http://127.0.0.1:\(ExampleConfiguration.controlPort)")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            if let error = viewModel.controlServerError {
+                Text("Control error: \(error)")
+                    .font(.caption2)
+                    .foregroundColor(.red)
+            }
             Text("Auto-purchase tracking: enabled")
                 .font(.caption2)
                 .foregroundColor(.secondary)
@@ -48,10 +59,10 @@ struct ContentView: View {
         VStack(spacing: 10) {
             actionButton("Set User ID", systemImage: "person.badge.plus", action: viewModel.setUserId)
             actionButton("Get User ID", systemImage: "person.fill", action: viewModel.getUserId)
-            actionButton("Track Purchase", systemImage: "cart.fill", action: viewModel.trackPurchase)
-            actionButton("Track Ad Revenue", systemImage: "dollarsign.circle.fill", action: viewModel.trackAdRevenue)
-            actionButton("Track Session Start", systemImage: "play.circle.fill", action: viewModel.trackSessionStart)
-            actionButton("Get Config", systemImage: "gearshape.fill", action: viewModel.getConfig)
+            actionButton("Track Purchase", systemImage: "cart.fill") { viewModel.trackPurchase() }
+            actionButton("Track Ad Revenue", systemImage: "dollarsign.circle.fill") { viewModel.trackAdRevenue() }
+            actionButton("Track Session Start", systemImage: "play.circle.fill") { viewModel.trackSessionStart() }
+            actionButton("Get Config", systemImage: "gearshape.fill") { viewModel.getConfig() }
 
             Button(action: viewModel.clearLog) {
                 HStack {

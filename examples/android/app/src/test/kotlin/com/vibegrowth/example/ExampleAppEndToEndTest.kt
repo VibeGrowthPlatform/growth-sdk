@@ -35,10 +35,10 @@ class ExampleAppEndToEndTest {
             return System.getenv("VIBEGROWTH_SDK_E2E") == "1"
         }
 
-    private val baseUrl get() = jsonField("baseUrl") ?: "http://[::1]:8000"
+    private val baseUrl get() = jsonField("baseUrl") ?: "http://127.0.0.1:8000"
     private val appId get() = jsonField("appId") ?: "sm_app_sdk_e2e"
     private val apiKey get() = jsonField("apiKey") ?: "sk_live_sdk_e2e_local_only"
-    private val chUrl get() = jsonField("clickHouseUrl") ?: "http://[::1]:8123"
+    private val chUrl get() = jsonField("clickHouseUrl") ?: "http://127.0.0.1:8123"
     private val chDb get() = jsonField("clickHouseDatabase") ?: "scalemonk"
 
     @Test

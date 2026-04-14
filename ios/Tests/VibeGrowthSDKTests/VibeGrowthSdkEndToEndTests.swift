@@ -5,8 +5,8 @@ import XCTest
 final class VibeGrowthSdkEndToEndTests: XCTestCase {
     private var testConfig = SdkE2EConfig.load()
 
-    private var sdkBaseUrl: String { testConfig?.baseUrl ?? ProcessInfo.processInfo.environment["VIBEGROWTH_SDK_E2E_BASE_URL"] ?? "http://[::1]:8000" }
-    private var clickHouseUrl: String { testConfig?.clickHouseUrl ?? ProcessInfo.processInfo.environment["VIBEGROWTH_SDK_E2E_CLICKHOUSE_URL"] ?? "http://[::1]:8123" }
+    private var sdkBaseUrl: String { simulatorLoopbackUrl(testConfig?.baseUrl ?? ProcessInfo.processInfo.environment["VIBEGROWTH_SDK_E2E_BASE_URL"] ?? "http://127.0.0.1:8000") }
+    private var clickHouseUrl: String { simulatorLoopbackUrl(testConfig?.clickHouseUrl ?? ProcessInfo.processInfo.environment["VIBEGROWTH_SDK_E2E_CLICKHOUSE_URL"] ?? "http://127.0.0.1:8123") }
     private var clickHouseDatabase: String { testConfig?.clickHouseDatabase ?? ProcessInfo.processInfo.environment["VIBEGROWTH_SDK_E2E_CLICKHOUSE_DATABASE"] ?? "scalemonk" }
     private var appId: String { testConfig?.appId ?? ProcessInfo.processInfo.environment["VIBEGROWTH_SDK_E2E_APP_ID"] ?? "sm_app_sdk_e2e" }
     private var apiKey: String { testConfig?.apiKey ?? ProcessInfo.processInfo.environment["VIBEGROWTH_SDK_E2E_API_KEY"] ?? "sk_live_sdk_e2e_local_only" }
@@ -214,6 +214,10 @@ final class VibeGrowthSdkEndToEndTests: XCTestCase {
     private func sqlString(_ value: String) -> String {
         return "'\(value.replacingOccurrences(of: "'", with: "''"))'"
     }
+
+    private func simulatorLoopbackUrl(_ value: String) -> String {
+        value.replacingOccurrences(of: "http://127.0.0.1:", with: "http://[::1]:")
+    }
 }
 
 private struct SdkE2EConfig {
@@ -240,8 +244,8 @@ private struct SdkE2EConfig {
             enabled: json["enabled"] as? Bool ?? false,
             appId: json["appId"] as? String ?? "sm_app_sdk_e2e",
             apiKey: json["apiKey"] as? String ?? "sk_live_sdk_e2e_local_only",
-            baseUrl: json["baseUrl"] as? String ?? "http://[::1]:8000",
-            clickHouseUrl: json["clickHouseUrl"] as? String ?? "http://[::1]:8123",
+            baseUrl: json["baseUrl"] as? String ?? "http://127.0.0.1:8000",
+            clickHouseUrl: json["clickHouseUrl"] as? String ?? "http://127.0.0.1:8123",
             clickHouseDatabase: json["clickHouseDatabase"] as? String ?? "scalemonk"
         )
     }

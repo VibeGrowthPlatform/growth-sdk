@@ -8,8 +8,8 @@ SDK_E2E_READY=false
 
 SDK_E2E_APP_ID="sm_app_sdk_e2e"
 SDK_E2E_API_KEY="sk_live_sdk_e2e_local_only"
-SDK_E2E_BASE_URL="http://[::1]:8000"
-SDK_E2E_CLICKHOUSE_URL="http://[::1]:8123"
+SDK_E2E_BASE_URL="http://127.0.0.1:8000"
+SDK_E2E_CLICKHOUSE_URL="http://127.0.0.1:8123"
 SDK_E2E_CLICKHOUSE_DATABASE=""
 SDK_E2E_CONFIG_FILE="/tmp/vibegrowth-sdk-e2e.json"
 
@@ -43,7 +43,7 @@ run_step() {
 }
 
 wait_for_backend_ready() {
-    local attempts=60
+    local attempts=180
     local delay_seconds=2
 
     for ((i=1; i<=attempts; i++)); do
@@ -164,12 +164,15 @@ run_step "Native Android build" bash -c '
     export JAVA_HOME=$(/usr/libexec/java_home -v 17)
     export PATH="$JAVA_HOME/bin:$PATH"
   fi
-  ./gradlew --no-daemon test build
+  ./gradlew --no-daemon clean test build
 '
 
 if [[ "$(uname -s)" == "Darwin" ]] && command -v xcodebuild >/dev/null 2>&1; then
     run_step "Native iOS build" bash -c "cd '$ROOT/vibegrowth-sdk-native/ios' && xcodebuild -scheme VibeGrowthSDK -destination 'generic/platform=iOS' build"
     run_step "Native iOS tests" bash -c "cd '$ROOT/vibegrowth-sdk-native/ios' && xcodebuild -scheme VibeGrowthSDK -destination 'platform=iOS Simulator,name=iPhone 16' test"
+    run_step "Native iOS example project" bash -c "cd '$ROOT/vibegrowth-sdk-native/examples/ios' && rm -rf VGExampleApp.xcodeproj && xcodegen generate"
+    run_step "Native iOS example build" bash -c "cd '$ROOT/vibegrowth-sdk-native/examples/ios' && xcodebuild -project VGExampleApp.xcodeproj -scheme VGExampleApp -destination 'platform=iOS Simulator,name=iPhone 16' build"
+    run_step "Native iOS example e2e tests" bash -c "cd '$ROOT/vibegrowth-sdk-native/examples/ios' && xcodebuild -project VGExampleApp.xcodeproj -scheme VGExampleApp -destination 'platform=iOS Simulator,name=iPhone 16' test"
 else
     bold "→ Native iOS build"
     echo "  skipped (requires macOS + Xcode)"

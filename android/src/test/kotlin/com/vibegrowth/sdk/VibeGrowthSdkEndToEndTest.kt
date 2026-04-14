@@ -444,8 +444,8 @@ class VibeGrowthSdkEndToEndTest {
         private const val SDK_E2E_CONFIG_PATH = "/tmp/vibegrowth-sdk-e2e.json"
         private const val DEFAULT_APP_ID = "sm_app_sdk_e2e"
         private const val DEFAULT_API_KEY = "sk_live_sdk_e2e_local_only"
-        private const val DEFAULT_BASE_URL = "http://[::1]:8000"
-        private const val DEFAULT_CLICKHOUSE_URL = "http://[::1]:8123"
+        private const val DEFAULT_BASE_URL = "http://127.0.0.1:8000"
+        private const val DEFAULT_CLICKHOUSE_URL = "http://127.0.0.1:8123"
         private const val DEFAULT_CLICKHOUSE_DATABASE = "scalemonk"
     }
 }
