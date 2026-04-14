@@ -26,6 +26,29 @@ The local end-to-end script verifies the resulting rows in ClickHouse tables:
 
 For Android emulators, the app reaches the host backend through `http://10.0.2.2:8000`.
 
+## Local Backend And Configuration
+
+The repeatable E2E path uses the shared local SDK test identity:
+
+| Field | Value |
+| --- | --- |
+| App ID | `sm_app_sdk_e2e` |
+| API key | `sk_live_sdk_e2e_local_only` |
+| Android emulator base URL | `http://10.0.2.2:8000` |
+| Host backend URL | `http://localhost:8000` |
+
+Prepare the local backend manually with:
+
+```bash
+docker compose up -d --build postgres clickhouse redis backend
+curl http://localhost:8000/api/readyz
+docker compose exec -T backend python -m app.forge.scripts.seed_sdk_e2e_app
+docker compose exec -T backend python -m app.release_tasks
+```
+
+The control script also accepts explicit `base_url`, `app_id`, and `api_key`
+arguments for runs against another backend app.
+
 ## Run The Full Local E2E Flow
 
 From the repo root:
@@ -99,11 +122,38 @@ POST /refresh
 
 The host reaches the control server at `http://127.0.0.1:8766` after `adb forward tcp:8766 tcp:8766`.
 
-## Local Backend Identity
+## Expected Signals
 
-The repeatable E2E path uses the shared SDK test identity:
+The example sends the canonical native Android SDK requests:
 
-- app id: `sm_app_sdk_e2e`
-- API key: `sk_live_sdk_e2e_local_only`
+- `initialize` sends `POST /api/sdk/init` and creates or refreshes a
+  `devices` row with platform `android`.
+- `set-user-id` sends `POST /api/sdk/identify` and updates the device
+  `user_id`.
+- `track-purchase` sends `POST /api/sdk/revenue` with
+  `revenue_type = purchase`, amount `4.99`, currency `USD`, and product
+  `gem_pack_100` unless overridden.
+- `track-ad-revenue` sends `POST /api/sdk/revenue` with
+  `revenue_type = ad_revenue`, source `admob`, amount `0.02`, and currency
+  `USD`.
+- `track-session-start` sends `POST /api/sdk/session`.
+- `get-config` sends `GET /api/sdk/config`.
 
-These are local-only credentials seeded by `app.forge.scripts.seed_sdk_e2e_app`.
+## Verify Backend Ingestion
+
+The full script verifies ClickHouse automatically. For manual runs, query the
+local ClickHouse tables:
+
+```bash
+docker compose exec -T clickhouse clickhouse-client --database scalemonk --query \
+  "SELECT device_id, platform, user_id FROM devices FINAL WHERE app_id = 'sm_app_sdk_e2e' ORDER BY updated_at DESC LIMIT 5"
+
+docker compose exec -T clickhouse clickhouse-client --database scalemonk --query \
+  "SELECT device_id, revenue_type, product_id, ad_source, amount, currency FROM revenue_events WHERE app_id = 'sm_app_sdk_e2e' ORDER BY received_at DESC LIMIT 5"
+
+docker compose exec -T clickhouse clickhouse-client --database scalemonk --query \
+  "SELECT device_id, user_id, is_first_session, session_start FROM session_events WHERE app_id = 'sm_app_sdk_e2e' ORDER BY received_at DESC LIMIT 5"
+```
+
+The successful E2E script prints the app ID, backend URL, control URL, generated
+user ID, generated product ID, resolved device ID, and verified tables.

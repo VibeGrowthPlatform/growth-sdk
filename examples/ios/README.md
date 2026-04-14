@@ -96,6 +96,23 @@ vibegrowth-sdk-native/examples/ios/scripts/control_ios_example.sh get-config
 
 Each command returns JSON with command status, elapsed time, and the app's runtime state snapshot.
 
+## Expected Signals
+
+The example sends the canonical native iOS SDK requests:
+
+- `initialize` sends `POST /api/sdk/init` and creates or refreshes a
+  `devices` row with platform `ios`.
+- `set-user-id` sends `POST /api/sdk/identify` and updates the device
+  `user_id`.
+- `track-purchase` sends `POST /api/sdk/revenue` with
+  `revenue_type = purchase`, amount `4.99`, currency `USD`, and product
+  `gem_pack_100` unless overridden.
+- `track-ad-revenue` sends `POST /api/sdk/revenue` with
+  `revenue_type = ad_revenue`, source `admob`, amount `0.02`, and currency
+  `USD`.
+- `track-session-start` sends `POST /api/sdk/session`.
+- `get-config` sends `GET /api/sdk/config`.
+
 ## End-to-End Verification
 
 The SDK validation script generates the Xcode project, builds the example, and runs `VGExampleAppTests/ExampleAppEndToEndTest.swift` when macOS and Xcode are available:

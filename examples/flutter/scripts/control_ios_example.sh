@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Drives the Vibe Growth Flutter example app via its in-app HTTP control
 # server. Defaults target the iOS Simulator (localhost). For an Android
-# emulator, first run `adb reverse tcp:8765 tcp:8765` and keep the host at
+# emulator, first run `adb forward tcp:8765 tcp:8765` and keep the host at
 # 127.0.0.1. For a physical device, point VG_EXAMPLE_CONTROL_HOST at its
 # LAN IP.
 

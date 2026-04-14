@@ -91,8 +91,8 @@ VibeGrowthSDK.GetConfig(
 
 ## Development
 
-- Sample integration: `Samples~/BasicIntegration/`
-- Runnable real-backend example: `Examples~/UnityPlayerE2E/`
+- Sample integration: `Samples~/BasicIntegration/README.md`
+- Runnable real-backend example: `Examples~/UnityPlayerE2E/README.md`
 - Runtime code is backed by vendored native sources from `../vibegrowth-sdk-native/`.
 
 ### Real-Backend E2E

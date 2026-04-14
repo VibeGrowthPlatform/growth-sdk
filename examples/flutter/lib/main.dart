@@ -1027,7 +1027,7 @@ class _ServerUrlCard extends StatelessWidget {
           Text(
             sdkReady
                 ? 'The SDK is initialized for this app session. Restart the app to use a different URL.'
-                : 'On the iOS Simulator and Android emulator, http://localhost:8000 points to the host Mac. For a physical device, use your Mac LAN IP.',
+                : 'Use http://localhost:8000 on iOS Simulator. On Android emulator, use http://10.0.2.2:8000 or reverse port 8000. For a physical device, use your Mac LAN IP.',
             style: TextStyle(
               fontSize: 11,
               color: Colors.grey.shade700,
