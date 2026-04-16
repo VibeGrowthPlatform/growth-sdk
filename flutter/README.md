@@ -2,7 +2,7 @@
 
 Flutter plugin for attribution, user identity, session tracking, and revenue tracking.
 
-**Version:** 2.1.0
+**Version:** 0.0.1
 
 **Requirements:** Dart >= 3.0.0, Flutter >= 3.10.0, Android minSdk 21, iOS 14+
 
@@ -12,7 +12,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  vibegrowth_sdk: ^2.1.0
+  vibegrowth_sdk: ^0.0.1
 ```
 
 Then run:

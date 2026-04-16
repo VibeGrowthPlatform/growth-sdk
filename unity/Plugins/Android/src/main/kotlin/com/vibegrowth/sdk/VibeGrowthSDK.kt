@@ -29,7 +29,7 @@ object VibeGrowthSDK {
     }
 
     private const val PLATFORM = "android"
-    private const val SDK_VERSION = "2.1.0"
+    private const val SDK_VERSION = "0.0.1"
 
     private var isInitialized = false
     private lateinit var config: VibeGrowthConfig

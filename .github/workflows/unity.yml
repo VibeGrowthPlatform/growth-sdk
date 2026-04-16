@@ -8,7 +8,7 @@ on:
       - 'examples/unity-basic/**'
       - 'examples/unity-player-e2e/**'
       - '.github/workflows/unity.yml'
-    tags: ['unity/v*']
+    tags: ['v*']
   pull_request:
     paths:
       - 'unity/**'

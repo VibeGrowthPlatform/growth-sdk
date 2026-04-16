@@ -71,7 +71,7 @@ The E2E test drives:
 
 It then polls ClickHouse for the seeded SDK app until it observes:
 
-- a `devices` row with platform `unity` and SDK version `2.1.0`
+- a `devices` row with platform `unity` and SDK version `0.0.1`
 - the synced user id on the same device
 - purchase and ad revenue rows in `revenue_events`
 - first-session and subsequent-session rows in `session_events`

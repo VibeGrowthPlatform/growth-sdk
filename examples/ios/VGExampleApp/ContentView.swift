@@ -27,7 +27,7 @@ struct ContentView: View {
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("SDK v2.1.0")
+            Text("SDK v0.0.1")
                 .font(.caption)
                 .foregroundColor(.secondary)
             Text("Init: \(viewModel.initStatus)")

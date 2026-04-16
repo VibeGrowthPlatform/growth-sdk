@@ -7,7 +7,7 @@ on:
       - 'flutter/**'
       - 'examples/flutter/**'
       - '.github/workflows/flutter.yml'
-    tags: ['flutter/v*']
+    tags: ['v*']
   pull_request:
     paths:
       - 'flutter/**'

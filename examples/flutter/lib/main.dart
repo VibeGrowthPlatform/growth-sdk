@@ -20,7 +20,7 @@ import 'package:vibegrowth_sdk/vibegrowth_sdk.dart';
 const String _kAppId = 'sm_app_s8zfvx45e79b';
 const String _kApiKey = 'sk_live_l2f_w0ntg7CMWTSEDkzZ_iPpioB7Vfj9H-DHSd5DujM';
 const String _kBaseUrl = 'http://localhost:8000';
-const String _kSdkVersion = '2.1.0';
+const String _kSdkVersion = '0.0.1';
 const int _kControlPort = 8765;
 const MethodChannel _exampleStorageChannel =
     MethodChannel('com.vibegrowth.sdk/channel');

@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - vibegrowth_sdk (2.1.0):
+  - vibegrowth_sdk (0.0.1):
     - Flutter
 
 DEPENDENCIES:

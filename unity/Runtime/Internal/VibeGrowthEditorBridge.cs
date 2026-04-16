@@ -16,7 +16,7 @@ namespace VibeGrowth
         private const string UserIdKey = "vibegrowth_user_id";
         private const string HasTrackedFirstSessionKey = "vibegrowth_has_tracked_first_session";
         private const string Platform = "unity";
-        private const string SdkVersion = "2.1.0";
+        private const string SdkVersion = "0.0.1";
 
         private bool _initialized;
         private string _appId;

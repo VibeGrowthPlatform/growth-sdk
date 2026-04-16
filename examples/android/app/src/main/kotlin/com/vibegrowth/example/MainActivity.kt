@@ -40,7 +40,7 @@ class MainActivity : Activity() {
 
         // Subtitle with version info
         root.addView(TextView(this).apply {
-            text = "SDK v2.1.0 | Control: http://127.0.0.1:${ExampleController.CONTROL_PORT}"
+            text = "SDK v0.0.1 | Control: http://127.0.0.1:${ExampleController.CONTROL_PORT}"
             textSize = 12f
             setTextColor(Color.GRAY)
             gravity = Gravity.CENTER

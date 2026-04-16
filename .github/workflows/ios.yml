@@ -7,7 +7,7 @@ on:
       - 'ios/**'
       - 'examples/ios/**'
       - '.github/workflows/ios.yml'
-    tags: ['ios/v*']
+    tags: ['v*']
   pull_request:
     paths:
       - 'ios/**'

@@ -106,7 +106,7 @@ public sealed class VibeGrowthPlayerE2EController : MonoBehaviour
             LIMIT 1
             FORMAT TSVRaw
         ");
-        EventuallyEquals(config, "2.1.0", $@"
+        EventuallyEquals(config, "0.0.1", $@"
             SELECT sdk_version
             FROM devices FINAL
             WHERE device_id = {SqlString(deviceId)}

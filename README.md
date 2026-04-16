@@ -5,16 +5,17 @@ growth platform. This monorepo contains native iOS, native Android, Flutter,
 and Unity packages that ship attribution, user identity, session tracking,
 revenue tracking, and remote config to the Vibe Growth backend.
 
-| Package | Path | Registry |
+| Package | Path | Distribution |
 | --- | --- | --- |
-| iOS (Swift) | [`ios/`](ios/) | Swift Package Manager |
-| Android (Kotlin) | [`android/`](android/) | Maven Central |
-| Flutter | [`flutter/`](flutter/) | [pub.dev](https://pub.dev) |
-| Unity | [`unity/`](unity/) | UPM (Git URL / OpenUPM) |
+| iOS (Swift) | [`ios/`](ios/) | Swift Package Manager (GitHub) |
+| Android (Kotlin) | [`android/`](android/) | [JitPack](https://jitpack.io) |
+| Flutter | [`flutter/`](flutter/) | [pub.dev](https://pub.dev/packages/vibegrowth_sdk) |
+| Unity | [`unity/`](unity/) | UPM via Git URL |
 
 Example apps for each platform live under [`examples/`](examples/).
 
-**SDK version:** `2.1.0`
+**SDK version:** `0.0.1` — all four packages are released together under the
+same version. See [RELEASING.md](RELEASING.md) for the release flow.
 
 ## Quickstart
 
@@ -22,7 +23,7 @@ Example apps for each platform live under [`examples/`](examples/).
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/VibeGrowthPlatform/growth-sdk.git", from: "2.1.0"),
+    .package(url: "https://github.com/VibeGrowthPlatform/growth-sdk.git", from: "0.0.1"),
 ],
 targets: [
     .target(name: "App", dependencies: [
@@ -31,19 +32,31 @@ targets: [
 ]
 ```
 
-### Android (Gradle)
+### Android (Gradle, via JitPack)
 
 ```kotlin
+// settings.gradle.kts
+dependencyResolutionManagement {
+    repositories {
+        maven { url = uri("https://jitpack.io") }
+    }
+}
+
+// build.gradle.kts
 dependencies {
-    implementation("com.vibegrowth:sdk:2.1.0")
+    implementation("com.github.VibeGrowthPlatform.growth-sdk:android:v0.0.1")
 }
 ```
+
+(The `.repo:module` form is JitPack's convention for monorepos. Maven Central
+publication is planned for a future release and will simplify the
+coordinates.)
 
 ### Flutter (`pubspec.yaml`)
 
 ```yaml
 dependencies:
-  vibegrowth_sdk: ^2.1.0
+  vibegrowth_sdk: ^0.0.1
 ```
 
 ### Unity (`Packages/manifest.json`)
@@ -51,7 +64,7 @@ dependencies:
 ```json
 {
   "dependencies": {
-    "com.vibegrowth.sdk": "https://github.com/VibeGrowthPlatform/growth-sdk.git?path=unity#unity/v2.1.0"
+    "com.vibegrowth.sdk": "https://github.com/VibeGrowthPlatform/growth-sdk.git?path=unity#v0.0.1"
   }
 }
 ```
@@ -96,9 +109,9 @@ repo for how to bring it up (`make dev`).
 
 ## Releasing
 
-Per-SDK independent releases use prefixed tags: `ios/vX.Y.Z`, `android/vX.Y.Z`,
-`flutter/vX.Y.Z`, `unity/vX.Y.Z`. Each tag triggers the corresponding workflow
-under `.github/workflows/`.
+All four packages share one version. A release is a single `vX.Y.Z` tag
+pushed on `main`; every platform's workflow in `.github/workflows/` fires
+concurrently. See [RELEASING.md](RELEASING.md) for the full flow.
 
 ## Contributing
 

@@ -1,6 +1,9 @@
 name: vibegrowth_sdk
-description: Vibe Growth SDK for Flutter - attribution, user identity, and revenue tracking.
-version: 2.1.0
+description: Vibe Growth SDK for Flutter - attribution, user identity, session tracking, and revenue tracking against the Vibe Growth platform.
+version: 0.0.1
+homepage: https://vibegrowin.ai
+repository: https://github.com/VibeGrowthPlatform/growth-sdk
+issue_tracker: https://github.com/VibeGrowthPlatform/growth-sdk/issues
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

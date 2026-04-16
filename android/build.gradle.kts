@@ -1,10 +1,11 @@
 plugins {
     id("com.android.library") version "8.1.4"
     id("org.jetbrains.kotlin.android") version "1.9.22"
+    `maven-publish`
 }
 
 group = "com.vibegrowth"
-version = "2.1.0"
+version = "0.0.1"
 
 android {
     namespace = "com.vibegrowth.sdk"
@@ -12,7 +13,7 @@ android {
 
     defaultConfig {
         minSdk = 21
-        buildConfigField("String", "SDK_VERSION", "\"1.0.0\"")
+        buildConfigField("String", "SDK_VERSION", "\"${project.version}\"")
     }
 
     buildFeatures {
@@ -30,6 +31,25 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            register<MavenPublication>("release") {
+                from(components["release"])
+                groupId = project.group.toString()
+                artifactId = "android"
+                version = project.version.toString()
+            }
+        }
     }
 }
 

@@ -6,7 +6,7 @@ import StoreKit
 
     private static let storeSuiteName = "com.vibegrowth.sdk"
     private static let platform = "ios"
-    private static let sdkVersion = "2.1.0"
+    private static let sdkVersion = "0.0.1"
     private static let firstSessionKey = "vibegrowth_has_tracked_first_session"
 
     internal static var attributionProviderForTests: (() -> [String: Any])?

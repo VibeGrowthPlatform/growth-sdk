@@ -2,7 +2,7 @@
 
 Unity plugin for attribution, user identity, session tracking, and revenue tracking.
 
-**Version:** 2.1.0
+**Version:** 0.0.1
 
 **Requirements:** Unity 2021.3+, Android minSdk 21, iOS 14+
 
@@ -13,7 +13,7 @@ Add to your `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.vibegrowth.sdk": "https://github.com/VibeGrowthPlatform/growth-sdk.git?path=unity#unity/v2.1.0"
+    "com.vibegrowth.sdk": "https://github.com/VibeGrowthPlatform/growth-sdk.git?path=unity#v0.0.1"
   }
 }
 ```

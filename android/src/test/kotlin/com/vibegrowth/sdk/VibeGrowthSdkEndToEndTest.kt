@@ -65,7 +65,7 @@ class VibeGrowthSdkEndToEndTest {
             """.trimIndent(),
         )
         eventuallyEquals(
-            expected = "2.1.0",
+            expected = "0.0.1",
             query = """
                 SELECT sdk_version
                 FROM devices FINAL

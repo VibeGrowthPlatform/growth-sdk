@@ -14,4 +14,4 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "vibegrowth-sdk-android"
+rootProject.name = "android"

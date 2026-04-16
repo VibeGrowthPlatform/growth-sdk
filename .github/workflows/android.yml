@@ -7,7 +7,7 @@ on:
       - 'android/**'
       - 'examples/android/**'
       - '.github/workflows/android.yml'
-    tags: ['android/v*']
+    tags: ['v*']
   pull_request:
     paths:
       - 'android/**'

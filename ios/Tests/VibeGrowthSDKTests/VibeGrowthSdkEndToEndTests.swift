@@ -59,7 +59,7 @@ final class VibeGrowthSdkEndToEndTests: XCTestCase {
             """
         )
         try eventuallyEquals(
-            "2.1.0",
+            "0.0.1",
             query: """
                 SELECT sdk_version
                 FROM devices FINAL

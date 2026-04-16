@@ -90,7 +90,7 @@ public static class VibeGrowthUnityE2ERunner
         );
         EventuallyEquals(
             config,
-            "2.1.0",
+            "0.0.1",
             $@"
                 SELECT sdk_version
                 FROM devices FINAL
