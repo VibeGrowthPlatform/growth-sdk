@@ -1,6 +1,6 @@
 # Vibe Growth SDKs
 
-Open-source client SDKs for the [Vibe Growth](https://vibegrowth.com) mobile app
+Open-source client SDKs for the [Vibe Growth](https://vibegrowin.ai) mobile app
 growth platform. This monorepo contains native iOS, native Android, Flutter,
 and Unity packages that ship attribution, user identity, session tracking,
 revenue tracking, and remote config to the Vibe Growth backend.

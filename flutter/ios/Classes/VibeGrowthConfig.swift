@@ -6,7 +6,7 @@ import Foundation
     @objc public let baseUrl: String
     @objc public let autoTrackPurchases: Bool
 
-    @objc public init(appId: String, apiKey: String, baseUrl: String = "https://api.vibegrowth.com", autoTrackPurchases: Bool = true) {
+    @objc public init(appId: String, apiKey: String, baseUrl: String = "https://api.vibegrowin.ai", autoTrackPurchases: Bool = true) {
         self.appId = appId
         self.apiKey = apiKey
         self.baseUrl = baseUrl

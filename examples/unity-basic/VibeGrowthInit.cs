@@ -11,7 +11,7 @@ namespace VibeGrowth.Sample
                 apiKey: "your-api-key",
                 onSuccess: () => Debug.Log("Vibe Growth initialized"),
                 onError: (error) => Debug.LogError("Vibe Growth init failed: " + error),
-                baseUrl: "https://api.vibegrowth.com"
+                baseUrl: "https://api.vibegrowin.ai"
             );
         }
     }

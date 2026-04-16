@@ -38,7 +38,7 @@ VibeGrowthSDK.Initialize(
     onError: (error) => {
         Debug.LogError("Init failed: " + error);
     },
-    baseUrl: "https://api.vibegrowth.com"
+    baseUrl: "https://api.vibegrowin.ai"
 );
 ```
 

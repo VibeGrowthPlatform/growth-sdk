@@ -9,7 +9,7 @@ class VibeGrowthConfigTest {
     fun `uses default base url`() {
         val config = VibeGrowthConfig(appId = "app", apiKey = "key")
 
-        assertEquals("https://api.vibegrowth.com", config.baseUrl)
+        assertEquals("https://api.vibegrowin.ai", config.baseUrl)
     }
 
     @Test

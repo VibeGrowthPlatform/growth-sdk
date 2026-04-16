@@ -5,7 +5,7 @@ final class VibeGrowthConfigTests: XCTestCase {
     func testDefaultBaseUrl() {
         let config = VibeGrowthConfig(appId: "app", apiKey: "key")
 
-        XCTAssertEqual(config.baseUrl, "https://api.vibegrowth.com")
+        XCTAssertEqual(config.baseUrl, "https://api.vibegrowin.ai")
     }
 
     func testExplicitBaseUrlOverride() {

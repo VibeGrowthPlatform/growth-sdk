@@ -3,9 +3,9 @@ Pod::Spec.new do |s|
   s.version          = '2.1.0'
   s.summary          = 'Vibe Growth SDK for Flutter - iOS platform bridge.'
   s.description      = 'Vibe Growth SDK Flutter plugin iOS implementation with attribution, user identity, and revenue tracking.'
-  s.homepage         = 'https://vibegrowth.com'
+  s.homepage         = 'https://vibegrowin.ai'
   s.license          = { :type => 'MIT' }
-  s.author           = { 'Vibe Growth' => 'dev@vibegrowth.com' }
+  s.author           = { 'Vibe Growth' => 'dev@vibegrowin.ai' }
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*'
   s.platform         = :ios, '14.0'

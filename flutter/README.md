@@ -35,7 +35,7 @@ import 'package:vibegrowth_sdk/vibegrowth_sdk.dart';
 await VibeGrowth.initialize(
   appId: 'your-app-id',
   apiKey: 'your-api-key',
-  baseUrl: 'https://api.vibegrowth.com',
+  baseUrl: 'https://api.vibegrowin.ai',
 );
 ```
 

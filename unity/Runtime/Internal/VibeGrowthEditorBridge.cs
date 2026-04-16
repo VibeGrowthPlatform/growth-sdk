@@ -11,7 +11,7 @@ namespace VibeGrowth
 {
     internal class VibeGrowthEditorBridge : IVibeGrowthNativeBridge
     {
-        private const string DefaultBaseUrl = "https://api.vibegrowth.com";
+        private const string DefaultBaseUrl = "https://api.vibegrowin.ai";
         private const string DeviceIdKey = "vibegrowth_device_id";
         private const string UserIdKey = "vibegrowth_user_id";
         private const string HasTrackedFirstSessionKey = "vibegrowth_has_tracked_first_session";
