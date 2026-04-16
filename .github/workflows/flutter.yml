@@ -1,0 +1,33 @@
+name: Flutter
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'flutter/**'
+      - 'examples/flutter/**'
+      - '.github/workflows/flutter.yml'
+    tags: ['flutter/v*']
+  pull_request:
+    paths:
+      - 'flutter/**'
+      - 'examples/flutter/**'
+      - '.github/workflows/flutter.yml'
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Pub get
+        working-directory: flutter
+        run: flutter pub get
+      - name: Analyze
+        working-directory: flutter
+        run: flutter analyze
+      - name: Test
+        working-directory: flutter
+        run: flutter test

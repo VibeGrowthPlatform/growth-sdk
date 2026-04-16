@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-ANDROID_EXAMPLE_DIR="$ROOT/vibegrowth-sdk-native/examples/android"
+ANDROID_EXAMPLE_DIR="$ROOT/examples/android"
 CONTROL_SCRIPT="$ANDROID_EXAMPLE_DIR/scripts/control_android_example.sh"
 
 APP_ID="${VIBEGROWTH_SDK_E2E_APP_ID:-sm_app_sdk_e2e}"
@@ -14,14 +14,10 @@ CLICKHOUSE_DB="${VIBEGROWTH_SDK_E2E_CLICKHOUSE_DATABASE:-scalemonk}"
 CONTROL_PORT="${VG_ANDROID_EXAMPLE_CONTROL_PORT:-8766}"
 ADB="${ADB:-adb}"
 
-PREPARE_BACKEND=true
 INSTALL_APP=true
 
 for arg in "$@"; do
   case "$arg" in
-    --skip-backend)
-      PREPARE_BACKEND=false
-      ;;
     --skip-install)
       INSTALL_APP=false
       ;;
@@ -34,6 +30,7 @@ done
 
 bold() { printf '\033[1m%s\033[0m\n' "$*"; }
 green() { printf '\033[0;32m%s\033[0m\n' "$*"; }
+red() { printf '\033[0;31m%s\033[0m\n' "$*"; }
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -142,16 +139,14 @@ run_control() {
 require_cmd curl
 require_cmd "$ADB"
 
-if $PREPARE_BACKEND; then
-  require_cmd docker
-  bold "→ Android example e2e backend stack"
-  docker compose up -d --build postgres clickhouse redis backend
-  wait_for_backend_ready
-  docker compose exec -T backend python -m app.forge.scripts.seed_sdk_e2e_app
-  docker compose exec -T backend python -m app.release_tasks
-  CLICKHOUSE_DB="$(docker compose exec -T backend python -c 'from app.config import settings; print(settings.clickhouse_database)' | tr -d '\r')"
-  green "  ✓ backend ready, seeded app_id=$APP_ID, clickhouse_db=$CLICKHOUSE_DB"
+bold "→ Backend ready on $HOST_BASE_URL"
+if ! wait_for_backend_ready; then
+  red "Backend not reachable at $HOST_BASE_URL/api/readyz" >&2
+  red "Start the Vibe Growth backend (see the backend repo's 'make dev')" >&2
+  red "and seed the SDK e2e app before rerunning." >&2
+  exit 1
 fi
+green "  ✓ backend ready, app_id=$APP_ID, clickhouse_db=$CLICKHOUSE_DB"
 
 bold "→ Android device"
 DEVICE_STATE=""

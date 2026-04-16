@@ -37,13 +37,11 @@ The repeatable E2E path uses the shared local SDK test identity:
 | Android emulator base URL | `http://10.0.2.2:8000` |
 | Host backend URL | `http://localhost:8000` |
 
-Prepare the local backend manually with:
+Prepare the local backend by running the Vibe Growth backend repo's `make dev`
+and seeding the SDK E2E app (see that repo's README). Then verify:
 
 ```bash
-docker compose up -d --build postgres clickhouse redis backend
 curl http://localhost:8000/api/readyz
-docker compose exec -T backend python -m app.forge.scripts.seed_sdk_e2e_app
-docker compose exec -T backend python -m app.release_tasks
 ```
 
 The control script also accepts explicit `base_url`, `app_id`, and `api_key`
@@ -51,13 +49,7 @@ arguments for runs against another backend app.
 
 ## Run The Full Local E2E Flow
 
-From the repo root:
-
-```bash
-make validate-android-example-e2e
-```
-
-Equivalent direct command:
+From the repo root, with the Vibe Growth backend already running locally:
 
 ```bash
 bash scripts/validate-android-example-e2e.sh
@@ -65,26 +57,22 @@ bash scripts/validate-android-example-e2e.sh
 
 The script:
 
-1. starts `postgres`, `clickhouse`, `redis`, and `backend`
-2. waits for `GET /api/readyz`
-3. seeds the SDK E2E app (`sm_app_sdk_e2e`)
-4. runs ClickHouse release tasks
-5. installs this example app on the current Android emulator/device
-6. forwards host port `8766` to the app control server
-7. drives SDK calls through the running app
-8. queries ClickHouse until the expected device, revenue, and session rows appear
+1. waits for `GET /api/readyz` on `http://localhost:8000`
+2. installs this example app on the current Android emulator/device
+3. forwards host port `8766` to the app control server
+4. drives SDK calls through the running app
+5. queries ClickHouse until the expected device, revenue, and session rows appear
 
-Use these options when the backend or app is already prepared:
+Skip the app install when it is already present:
 
 ```bash
-bash scripts/validate-android-example-e2e.sh --skip-backend
 bash scripts/validate-android-example-e2e.sh --skip-install
 ```
 
 ## Build And Run Manually
 
 ```bash
-cd vibegrowth-sdk-native/examples/android
+cd examples/android
 ./gradlew --no-daemon :app:installDebug
 adb shell am start -n com.vibegrowth.example/.MainActivity
 adb forward tcp:8766 tcp:8766
@@ -95,15 +83,15 @@ The app does not initialize the SDK automatically. Initialize it from the UI or 
 ## Control Protocol
 
 ```bash
-vibegrowth-sdk-native/examples/android/scripts/control_android_example.sh forward
-vibegrowth-sdk-native/examples/android/scripts/control_android_example.sh open
-vibegrowth-sdk-native/examples/android/scripts/control_android_example.sh initialize http://10.0.2.2:8000
-vibegrowth-sdk-native/examples/android/scripts/control_android_example.sh set-user-id android-user-123
-vibegrowth-sdk-native/examples/android/scripts/control_android_example.sh track-purchase 4.99 USD gem_pack_100
-vibegrowth-sdk-native/examples/android/scripts/control_android_example.sh track-ad-revenue admob 0.02 USD
-vibegrowth-sdk-native/examples/android/scripts/control_android_example.sh track-session-start 2026-04-10T10:00:00+00:00
-vibegrowth-sdk-native/examples/android/scripts/control_android_example.sh get-config
-vibegrowth-sdk-native/examples/android/scripts/control_android_example.sh status
+examples/android/scripts/control_android_example.sh forward
+examples/android/scripts/control_android_example.sh open
+examples/android/scripts/control_android_example.sh initialize http://10.0.2.2:8000
+examples/android/scripts/control_android_example.sh set-user-id android-user-123
+examples/android/scripts/control_android_example.sh track-purchase 4.99 USD gem_pack_100
+examples/android/scripts/control_android_example.sh track-ad-revenue admob 0.02 USD
+examples/android/scripts/control_android_example.sh track-session-start 2026-04-10T10:00:00+00:00
+examples/android/scripts/control_android_example.sh get-config
+examples/android/scripts/control_android_example.sh status
 ```
 
 Supported HTTP paths on the app control server:

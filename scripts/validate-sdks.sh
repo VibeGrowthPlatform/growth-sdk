@@ -8,9 +8,9 @@ SDK_E2E_READY=false
 
 SDK_E2E_APP_ID="sm_app_sdk_e2e"
 SDK_E2E_API_KEY="sk_live_sdk_e2e_local_only"
-SDK_E2E_BASE_URL="http://127.0.0.1:8000"
-SDK_E2E_CLICKHOUSE_URL="http://127.0.0.1:8123"
-SDK_E2E_CLICKHOUSE_DATABASE=""
+SDK_E2E_BASE_URL="${VIBEGROWTH_SDK_E2E_BASE_URL:-http://127.0.0.1:8000}"
+SDK_E2E_CLICKHOUSE_URL="${VIBEGROWTH_SDK_E2E_CLICKHOUSE_URL:-http://127.0.0.1:8123}"
+SDK_E2E_CLICKHOUSE_DATABASE="${VIBEGROWTH_SDK_E2E_CLICKHOUSE_DATABASE:-scalemonk}"
 SDK_E2E_CONFIG_FILE="/tmp/vibegrowth-sdk-e2e.json"
 
 for arg in "$@"; do
@@ -43,7 +43,7 @@ run_step() {
 }
 
 wait_for_backend_ready() {
-    local attempts=180
+    local attempts=60
     local delay_seconds=2
 
     for ((i=1; i<=attempts; i++)); do
@@ -81,57 +81,18 @@ PY
 }
 
 prepare_sdk_e2e_env() {
-    bold "→ SDK e2e backend stack"
-    if docker compose up -d --build --force-recreate postgres clickhouse redis backend; then
-        green "  ✓ SDK e2e backend stack passed"
-    else
-        red "  ✗ SDK e2e backend stack FAILED"
-        FAILED=$((FAILED + 1))
-        echo
-        return 1
-    fi
-    echo
-
     bold "→ SDK e2e backend ready"
     if wait_for_backend_ready; then
         green "  ✓ SDK e2e backend ready passed"
     else
         red "  ✗ SDK e2e backend ready FAILED"
+        red "    Start the Vibe Growth backend locally (see the backend repo's 'make dev')"
+        red "    and seed the SDK e2e app before rerunning with --e2e."
         FAILED=$((FAILED + 1))
         echo
         return 1
     fi
     echo
-
-    bold "→ SDK e2e seed app"
-    if docker compose exec -T backend python -m app.forge.scripts.seed_sdk_e2e_app; then
-        green "  ✓ SDK e2e seed app passed"
-    else
-        red "  ✗ SDK e2e seed app FAILED"
-        FAILED=$((FAILED + 1))
-        echo
-        return 1
-    fi
-    echo
-
-    bold "→ SDK e2e ClickHouse migrations"
-    if docker compose exec -T backend python -m app.release_tasks; then
-        green "  ✓ SDK e2e ClickHouse migrations passed"
-    else
-        red "  ✗ SDK e2e ClickHouse migrations FAILED"
-        FAILED=$((FAILED + 1))
-        echo
-        return 1
-    fi
-    echo
-
-    SDK_E2E_CLICKHOUSE_DATABASE="$(docker compose exec -T backend python -c 'from app.config import settings; print(settings.clickhouse_database)' | tr -d '\r')"
-    if [[ -z "$SDK_E2E_CLICKHOUSE_DATABASE" ]]; then
-        red "  ✗ SDK e2e ClickHouse database resolution FAILED"
-        FAILED=$((FAILED + 1))
-        echo
-        return 1
-    fi
 
     export VIBEGROWTH_SDK_E2E=1
     export VIBEGROWTH_SDK_E2E_APP_ID="$SDK_E2E_APP_ID"
@@ -155,11 +116,11 @@ if $RUN_E2E; then
     prepare_sdk_e2e_env || true
 fi
 
-run_step "Flutter analyze" bash -c "cd '$ROOT/vibegrowth-sdk-flutter' && flutter analyze"
-run_step "Flutter test" bash -c "cd '$ROOT/vibegrowth-sdk-flutter' && flutter test"
+run_step "Flutter analyze" bash -c "cd '$ROOT/flutter' && flutter analyze"
+run_step "Flutter test" bash -c "cd '$ROOT/flutter' && flutter test"
 
 run_step "Native Android build" bash -c '
-  cd "'"$ROOT"'/vibegrowth-sdk-native/android"
+  cd "'"$ROOT"'/android"
   if command -v /usr/libexec/java_home >/dev/null 2>&1; then
     export JAVA_HOME=$(/usr/libexec/java_home -v 17)
     export PATH="$JAVA_HOME/bin:$PATH"
@@ -168,11 +129,11 @@ run_step "Native Android build" bash -c '
 '
 
 if [[ "$(uname -s)" == "Darwin" ]] && command -v xcodebuild >/dev/null 2>&1; then
-    run_step "Native iOS build" bash -c "cd '$ROOT/vibegrowth-sdk-native/ios' && xcodebuild -scheme VibeGrowthSDK -destination 'generic/platform=iOS' build"
-    run_step "Native iOS tests" bash -c "cd '$ROOT/vibegrowth-sdk-native/ios' && xcodebuild -scheme VibeGrowthSDK -destination 'platform=iOS Simulator,name=iPhone 16' test"
-    run_step "Native iOS example project" bash -c "cd '$ROOT/vibegrowth-sdk-native/examples/ios' && rm -rf VGExampleApp.xcodeproj && xcodegen generate"
-    run_step "Native iOS example build" bash -c "cd '$ROOT/vibegrowth-sdk-native/examples/ios' && xcodebuild -project VGExampleApp.xcodeproj -scheme VGExampleApp -destination 'platform=iOS Simulator,name=iPhone 16' build"
-    run_step "Native iOS example e2e tests" bash -c "cd '$ROOT/vibegrowth-sdk-native/examples/ios' && xcodebuild -project VGExampleApp.xcodeproj -scheme VGExampleApp -destination 'platform=iOS Simulator,name=iPhone 16' test"
+    run_step "Native iOS build" bash -c "cd '$ROOT/ios' && xcodebuild -scheme VibeGrowthSDK -destination 'generic/platform=iOS' build"
+    run_step "Native iOS tests" bash -c "cd '$ROOT/ios' && xcodebuild -scheme VibeGrowthSDK -destination 'platform=iOS Simulator,name=iPhone 16' test"
+    run_step "Native iOS example project" bash -c "cd '$ROOT/examples/ios' && rm -rf VGExampleApp.xcodeproj && xcodegen generate"
+    run_step "Native iOS example build" bash -c "cd '$ROOT/examples/ios' && xcodebuild -project VGExampleApp.xcodeproj -scheme VGExampleApp -destination 'platform=iOS Simulator,name=iPhone 16' build"
+    run_step "Native iOS example e2e tests" bash -c "cd '$ROOT/examples/ios' && xcodebuild -project VGExampleApp.xcodeproj -scheme VGExampleApp -destination 'platform=iOS Simulator,name=iPhone 16' test"
 else
     bold "→ Native iOS build"
     echo "  skipped (requires macOS + Xcode)"
@@ -180,14 +141,14 @@ else
 fi
 
 if $RUN_E2E; then
-    run_step "Unity player app e2e" bash -c "cd '$ROOT' && vibegrowth-sdk-unity/Examples~/UnityPlayerE2E/scripts/run_player_e2e.sh"
+    run_step "Unity player app e2e" bash -c "cd '$ROOT' && examples/unity-player-e2e/scripts/run_player_e2e.sh"
 fi
 
 run_step "Vendored source sync" bash -c "
-  diff -rq --exclude '*.meta' '$ROOT/vibegrowth-sdk-native/android/src/main/kotlin/com/vibegrowth/sdk' '$ROOT/vibegrowth-sdk-unity/Plugins/Android/src/main/kotlin/com/vibegrowth/sdk' &&
-  diff -rq --exclude '*.meta' '$ROOT/vibegrowth-sdk-native/ios/Sources/VibeGrowthSDK' '$ROOT/vibegrowth-sdk-unity/Plugins/iOS/Sources' &&
-  diff -rq '$ROOT/vibegrowth-sdk-native/android/src/main/kotlin/com/vibegrowth/sdk' '$ROOT/vibegrowth-sdk-flutter/android/src/main/kotlin/com/vibegrowth/sdk' --exclude flutter &&
-  diff -rq '$ROOT/vibegrowth-sdk-native/ios/Sources/VibeGrowthSDK' '$ROOT/vibegrowth-sdk-flutter/ios/Classes' --exclude VibeGrowthSdkPlugin.swift
+  diff -rq --exclude '*.meta' '$ROOT/android/src/main/kotlin/com/vibegrowth/sdk' '$ROOT/unity/Plugins/Android/src/main/kotlin/com/vibegrowth/sdk' &&
+  diff -rq --exclude '*.meta' '$ROOT/ios/Sources/VibeGrowthSDK' '$ROOT/unity/Plugins/iOS/Sources' &&
+  diff -rq '$ROOT/android/src/main/kotlin/com/vibegrowth/sdk' '$ROOT/flutter/android/src/main/kotlin/com/vibegrowth/sdk' --exclude flutter &&
+  diff -rq '$ROOT/ios/Sources/VibeGrowthSDK' '$ROOT/flutter/ios/Classes' --exclude VibeGrowthSdkPlugin.swift
 "
 
 if $RUN_E2E && ! $SDK_E2E_READY; then

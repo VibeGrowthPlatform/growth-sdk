@@ -24,7 +24,7 @@ Auto-purchase tracking via StoreKit is enabled by default.
 ## Build and Run
 
 ```bash
-cd vibegrowth-sdk-native/examples/ios
+cd examples/ios
 
 # Generate the Xcode project from project.yml
 xcodegen generate
@@ -54,16 +54,10 @@ The app initializes the SDK through `ExampleViewModel` with these defaults:
 To test against the local backend, prepare the seeded SDK e2e app first. The repeatable path is:
 
 ```bash
-make validate-sdks-e2e
+bash scripts/validate-sdks.sh --e2e
 ```
 
-For manual app runs, start the backend stack and seed the local SDK app:
-
-```bash
-docker compose up -d postgres clickhouse redis backend
-docker compose exec -T backend python -m app.forge.scripts.seed_sdk_e2e_app
-docker compose exec -T backend python -m app.release_tasks
-```
+For manual app runs, start the Vibe Growth backend (see the backend repo's `make dev`) and seed the SDK E2E app per its README. The example reads these defaults but any reachable Vibe Growth API will work.
 
 The example also reads `VIBEGROWTH_SDK_E2E_APP_ID`, `VIBEGROWTH_SDK_E2E_API_KEY`, `VIBEGROWTH_SDK_E2E_BASE_URL`, and the shared `/tmp/vibegrowth-sdk-e2e.json` file written by `scripts/validate-sdks.sh --e2e` when those are available. The generated E2E config uses `http://127.0.0.1:8000` for host/JVM tests; the iOS simulator example normalizes that value to `[::1]` before issuing SDK requests.
 
@@ -86,12 +80,12 @@ POST /refresh
 Use the bundled script from the repo root:
 
 ```bash
-vibegrowth-sdk-native/examples/ios/scripts/control_ios_example.sh health
-vibegrowth-sdk-native/examples/ios/scripts/control_ios_example.sh set-user-id ios-example-user
-vibegrowth-sdk-native/examples/ios/scripts/control_ios_example.sh track-purchase 4.99 USD gem_pack_100
-vibegrowth-sdk-native/examples/ios/scripts/control_ios_example.sh track-ad-revenue admob 0.02 USD
-vibegrowth-sdk-native/examples/ios/scripts/control_ios_example.sh track-session-start 2026-04-06T10:00:00+00:00
-vibegrowth-sdk-native/examples/ios/scripts/control_ios_example.sh get-config
+examples/ios/scripts/control_ios_example.sh health
+examples/ios/scripts/control_ios_example.sh set-user-id ios-example-user
+examples/ios/scripts/control_ios_example.sh track-purchase 4.99 USD gem_pack_100
+examples/ios/scripts/control_ios_example.sh track-ad-revenue admob 0.02 USD
+examples/ios/scripts/control_ios_example.sh track-session-start 2026-04-06T10:00:00+00:00
+examples/ios/scripts/control_ios_example.sh get-config
 ```
 
 Each command returns JSON with command status, elapsed time, and the app's runtime state snapshot.

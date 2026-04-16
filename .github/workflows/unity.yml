@@ -1,0 +1,32 @@
+name: Unity
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'unity/**'
+      - 'examples/unity-basic/**'
+      - 'examples/unity-player-e2e/**'
+      - '.github/workflows/unity.yml'
+    tags: ['unity/v*']
+  pull_request:
+    paths:
+      - 'unity/**'
+      - 'examples/unity-basic/**'
+      - 'examples/unity-player-e2e/**'
+      - '.github/workflows/unity.yml'
+
+jobs:
+  package-sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate package.json
+        working-directory: unity
+        run: |
+          test -f package.json
+          python3 -c 'import json; json.load(open("package.json"))'
+      - name: Confirm vendored native sources present
+        run: |
+          test -d unity/Plugins/Android/src/main/kotlin/com/vibegrowth/sdk
+          test -d unity/Plugins/iOS/Sources

@@ -27,7 +27,7 @@ validates the persisted analytics state.
 To open the example app directly:
 
 ```bash
-open -a Unity --args -projectPath "$(pwd)/vibegrowth-sdk-unity/Examples~/UnityPlayerE2E"
+open -a Unity --args -projectPath "$(pwd)/examples/unity-player-e2e"
 ```
 
 Press Play. The example controller reads `/tmp/vibegrowth-sdk-e2e.json` when it
@@ -48,14 +48,14 @@ controller send the representative flow automatically after initialization.
 After the backend stack has been prepared:
 
 ```bash
-vibegrowth-sdk-unity/Examples~/UnityPlayerE2E/scripts/run_player_e2e.sh
+examples/unity-player-e2e/scripts/run_player_e2e.sh
 ```
 
 Override Unity discovery with:
 
 ```bash
 UNITY_EXECUTABLE=/Applications/Unity/Hub/Editor/2021.3.45f2/Unity.app/Contents/MacOS/Unity \
-  vibegrowth-sdk-unity/Examples~/UnityPlayerE2E/scripts/run_player_e2e.sh
+  examples/unity-player-e2e/scripts/run_player_e2e.sh
 ```
 
 ## What Gets Verified

@@ -6,7 +6,7 @@ minimal example app path for validating that Unity calls reach the native
 Android or iOS SDK bridge.
 
 For repeatable real-backend validation of the full Unity SDK flow, use the
-runnable project in `../../Examples~/UnityPlayerE2E` and its
+runnable project in `../unity-player-e2e/` and its
 `scripts/run_player_e2e.sh` runner.
 
 ## Prerequisites
@@ -115,7 +115,7 @@ Expected evidence:
 ## Automated Checks
 
 The plain SDK validation script checks that the Unity package's vendored native
-Android and iOS sources stay in sync with `vibegrowth-sdk-native`:
+Android and iOS sources stay in sync with the top-level `android/` and `ios/` packages:
 
 ```bash
 bash scripts/validate-sdks.sh

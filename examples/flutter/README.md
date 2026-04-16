@@ -13,16 +13,14 @@ so host-side scripts can drive SDK calls and inspect runtime state.
 
 ## Local Backend
 
-Start the backend stack from the repo root:
+Start the Vibe Growth backend (see the backend repo's `make dev`) and confirm it is ready:
 
 ```bash
-docker compose up -d --build postgres clickhouse redis backend
 curl http://localhost:8000/api/readyz
-docker compose exec -T backend python -m app.release_tasks
 ```
 
 The app initializes with the credentials embedded in
-`vibegrowth-sdk-flutter/example/lib/main.dart`:
+`examples/flutter/lib/main.dart`:
 
 | Field | Value |
 | --- | --- |
@@ -47,7 +45,7 @@ Backend reachability depends on the target:
 ## Run The App
 
 ```bash
-cd vibegrowth-sdk-flutter/example
+cd examples/flutter
 flutter pub get
 flutter run -d <simulator-or-emulator-id>
 ```
@@ -69,7 +67,7 @@ last base URL locally and uses the embedded App ID/API key above.
 The host control script can initialize the SDK and override only the base URL:
 
 ```bash
-vibegrowth-sdk-flutter/example/scripts/control_ios_example.sh initialize http://localhost:8000
+examples/flutter/scripts/control_ios_example.sh initialize http://localhost:8000
 ```
 
 Use `http://10.0.2.2:8000` for an Android emulator unless you have reversed
@@ -94,15 +92,15 @@ POST /refresh
 Example host sequence:
 
 ```bash
-chmod +x vibegrowth-sdk-flutter/example/scripts/control_ios_example.sh
-vibegrowth-sdk-flutter/example/scripts/control_ios_example.sh health
-vibegrowth-sdk-flutter/example/scripts/control_ios_example.sh initialize http://localhost:8000
-vibegrowth-sdk-flutter/example/scripts/control_ios_example.sh set-user-id flutter-example-user
-vibegrowth-sdk-flutter/example/scripts/control_ios_example.sh track-purchase 4.99 USD gem_pack_100
-vibegrowth-sdk-flutter/example/scripts/control_ios_example.sh track-ad-revenue admob 0.02 USD
-vibegrowth-sdk-flutter/example/scripts/control_ios_example.sh track-session-start 2026-04-10T10:00:00+00:00
-vibegrowth-sdk-flutter/example/scripts/control_ios_example.sh get-config
-vibegrowth-sdk-flutter/example/scripts/control_ios_example.sh status
+chmod +x examples/flutter/scripts/control_ios_example.sh
+examples/flutter/scripts/control_ios_example.sh health
+examples/flutter/scripts/control_ios_example.sh initialize http://localhost:8000
+examples/flutter/scripts/control_ios_example.sh set-user-id flutter-example-user
+examples/flutter/scripts/control_ios_example.sh track-purchase 4.99 USD gem_pack_100
+examples/flutter/scripts/control_ios_example.sh track-ad-revenue admob 0.02 USD
+examples/flutter/scripts/control_ios_example.sh track-session-start 2026-04-10T10:00:00+00:00
+examples/flutter/scripts/control_ios_example.sh get-config
+examples/flutter/scripts/control_ios_example.sh status
 ```
 
 Script overrides:

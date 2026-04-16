@@ -13,7 +13,7 @@ Add to your `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.vibegrowth.sdk": "https://github.com/vibegrowth/vibegrowth-sdk-unity.git#v2.1.0"
+    "com.vibegrowth.sdk": "https://github.com/VibeGrowthPlatform/growth-sdk.git?path=unity#unity/v2.1.0"
   }
 }
 ```
@@ -91,23 +91,23 @@ VibeGrowthSDK.GetConfig(
 
 ## Development
 
-- Sample integration: `Samples~/BasicIntegration/README.md`
-- Runnable real-backend example: `Examples~/UnityPlayerE2E/README.md`
-- Runtime code is backed by vendored native sources from `../vibegrowth-sdk-native/`.
+- Basic sample: `../examples/unity-basic/README.md`
+- Runnable real-backend example: `../examples/unity-player-e2e/README.md`
+- Runtime code is backed by vendored native sources from `../android/` and `../ios/` (kept in sync by `scripts/validate-sdks.sh`).
 
 ### Real-Backend E2E
 
-From the repo root, run:
+With the Vibe Growth backend running locally on `http://localhost:8000` (see the
+backend repo's `make dev`), from the repo root run:
 
 ```bash
 bash scripts/validate-sdks.sh --e2e
 ```
 
-This prepares the local backend stack, seeds the SDK E2E app, builds and runs
-the Unity example player app, and verifies the resulting device, revenue,
-session, and config state through ClickHouse and the SDK config endpoint. To run
-only the Unity portion after bootstrap:
+This builds and runs the Unity example player app and verifies the resulting
+device, revenue, session, and config state through ClickHouse and the SDK
+config endpoint. To run only the Unity portion:
 
 ```bash
-vibegrowth-sdk-unity/Examples~/UnityPlayerE2E/scripts/run_player_e2e.sh
+examples/unity-player-e2e/scripts/run_player_e2e.sh
 ```

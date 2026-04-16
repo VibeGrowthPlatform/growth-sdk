@@ -1,0 +1,24 @@
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# iOS / SwiftPM
+ios/.build/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+examples/ios/VGExampleApp.xcodeproj/
+
+# Android / Gradle
+android/.gradle/
+android/build/
+android/local.properties
+examples/android/.gradle/
+examples/android/build/
+examples/android/**/build/
+examples/android/local.properties
+**/*.iml
+
+# Node
+node_modules/

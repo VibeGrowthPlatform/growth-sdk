@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/../../../.." && pwd)"
-PROJECT_PATH="$ROOT/vibegrowth-sdk-unity/Examples~/UnityPlayerE2E"
+PROJECT_PATH="$(cd "$(dirname "$0")/.." && pwd)"
 RESULTS_PATH="$PROJECT_PATH/TestResults.xml"
 LOG_PATH="$PROJECT_PATH/unity-e2e.log"
 
