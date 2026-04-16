@@ -44,13 +44,11 @@ dependencyResolutionManagement {
 
 // build.gradle.kts
 dependencies {
-    implementation("com.github.VibeGrowthPlatform.growth-sdk:android:v0.0.1")
+    implementation("com.github.VibeGrowthPlatform:growth-sdk:v0.0.1")
 }
 ```
 
-(The `.repo:module` form is JitPack's convention for monorepos. Maven Central
-publication is planned for a future release and will simplify the
-coordinates.)
+Maven Central publication is planned for a future release.
 
 ### Flutter (`pubspec.yaml`)
 
